@@ -11,7 +11,7 @@
     "test": "jest",
     "watch-ts": "tsc -w",
     "watch-serve": "env-cmd .env nodemon -L --watch ./dist --exec \"node --inspect\" ./dist/index.js",
-    "heroku-postbuild": "bash ./tools/build.sh"
+    "heroku-postbuild": "bash ./tools/release.sh"
   },
   "jest": {
     "moduleFileExtensions": [
