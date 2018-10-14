@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "concurrently -n build-ts,serve --kill-others \"npm run watch-ts\" \"npm run watch-serve\"",
-    "start": "nodemon ./dist/index.js",
-    "test": "jest",
     "build-ts": "tsc",
+    "start": "nodemon ./dist/index.js",
+    "start:dev": "concurrently -n build-ts,serve --kill-others \"npm run watch-ts\" \"npm run watch-serve\"",
+    "prod": "npm run build-ts && npm run start",
+    "test": "jest",
     "watch-ts": "tsc -w",
     "watch-serve": "env-cmd .env nodemon -L --watch ./dist --exec \"node --inspect\" ./dist/index.js",
-    "prod": "npm run build-ts && npm run start"
+    "heroku-postbuild": "bash ./tools/build.sh"
   },
   "jest": {
     "moduleFileExtensions": [
