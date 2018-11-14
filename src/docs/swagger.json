@@ -21,7 +21,7 @@
     "/": {
       "get": {
         "tags": [
-          "pet"
+          "hello"
         ],
         "summary": "Test api",
         "description": "",
