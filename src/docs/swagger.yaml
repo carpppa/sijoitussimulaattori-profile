@@ -1,0 +1,40 @@
+swagger: "2.0"
+info:
+  description: "This is documentation for sijoitussimulaattori-profile API"
+  version: "1.0.0"
+  title: "Sijoitussimulaattori"
+
+host: "localhost:3000"
+basePath: "/"
+tags:
+- name: "hello"
+  description: ""
+schemes:
+- "https"
+- "http"
+paths:
+  /:
+    get:
+      tags:
+      - "pet"
+      summary: "Test api"
+      description: ""
+      operationId: "getHello"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          $ref: "#/definitions/Hello"
+        405:
+          description: "Invalid input"
+
+
+definitions:
+  Hello:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
