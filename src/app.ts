@@ -2,11 +2,8 @@ import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as Joi from 'joi';
 import * as boom from 'express-boom';
-import * as swaggerUi from 'swagger-ui-express';
 import { NextFunction, Request, Response } from 'express';
 import { Routes } from './routes';
-
-import * as swaggerDocument from './docs/swagger.json';
 
 interface JoiExpressError extends Error {
   error: Joi.ValidationError;
@@ -32,9 +29,6 @@ class App {
 
     // Boom HTTP errors
     this.app.use(boom());
-
-    // Swagger ui
-    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
   }
 
   private config(): void {
