@@ -1,0 +1,406 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is documentation for sijoitussimulaattori-profile API",
+    "version": "1.0.0",
+    "title": "Sijoitussimulaattori"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "test",
+      "description": ""
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Test api",
+        "description": "",
+        "operationId": "getHello",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/definitions/Hello"
+          },
+          "405": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/profile/portfolio": {
+      "post": {
+        "tags": [
+          "Portfolio"
+        ],
+        "summary": "Add new portfolio",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "portfolio",
+            "description": "The portfolio to create.",
+            "schema": {
+              "$ref": "#/definitions/PortfolioRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully created portfolio",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Portfolio"
+                }
+              ]
+            }
+          },
+          "400": {
+            "description": "Parameters invalid"
+          },
+          "401": {
+            "description": "Unauthorized/user not authenticated"
+          },
+          "403": {
+            "description": "User does not have ownership of the resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/profile/portfolio/{portfolioId}": {
+      "delete": {
+        "tags": [
+          "Portfolio"
+        ],
+        "summary": "Delete portfolio",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolioId",
+            "required": true,
+            "type": "string",
+            "description": "Portfolio where action is requested from"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete was successful",
+            "schema": {
+              "$ref": "#/definitions/Uid"
+            }
+          },
+          "400": {
+            "description": "Parameters invalid"
+          },
+          "401": {
+            "description": "Unauthorized/user not authenticated"
+          },
+          "403": {
+            "description": "User does not have ownership of the resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/profile/portfolio/{portfolioId}/balance": {
+      "post": {
+        "tags": [
+          "Portfolio"
+        ],
+        "summary": "Withdraw or save money",
+        "description": "Endpoint for withdrawing and saving money to/from portfolio",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolioId",
+            "required": true,
+            "type": "string",
+            "description": "Portfolio where action is requested from"
+          },
+          {
+            "in": "body",
+            "name": "transaction",
+            "description": "The transaction to create.",
+            "schema": {
+              "$ref": "#/definitions/MoneyTransactionRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transfer was successful",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/MoneyTransaction"
+                }
+              ]
+            }
+          },
+          "400": {
+            "description": "Parameters invalid"
+          },
+          "401": {
+            "description": "Unauthorized/user not authenticated"
+          },
+          "403": {
+            "description": "User does not have ownership of the resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/profile/portfolio/{portfolioId}/transaction": {
+      "post": {
+        "tags": [
+          "Portfolio"
+        ],
+        "summary": "Create transaction",
+        "description": "Endpoint for creating sell/buy request",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolioId",
+            "required": true,
+            "type": "string",
+            "description": "Portfolio where action is requested from"
+          },
+          {
+            "in": "body",
+            "name": "transaction",
+            "description": "Requested action.",
+            "schema": {
+              "$ref": "#/definitions/TransactionRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction creation successful",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Uid"
+                },
+                {
+                  "$ref": "#/definitions/TransactionRequest"
+                }
+              ]
+            }
+          },
+          "400": {
+            "description": "Parameters invalid"
+          },
+          "401": {
+            "description": "Unauthorized/user not authenticated"
+          },
+          "403": {
+            "description": "User does not have ownership of the resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/profile/portfolio/{portfolioId}/transaction/{transactionId}": {
+      "delete": {
+        "tags": [
+          "Portfolio"
+        ],
+        "summary": "Cancel transaction",
+        "description": "Endpoint for cancelling selling/buying transactions",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolioId",
+            "required": true,
+            "type": "string",
+            "description": "Portfolio where action is requested from"
+          },
+          {
+            "in": "path",
+            "name": "transactionId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction cancelled",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Uid"
+                }
+              ]
+            }
+          },
+          "400": {
+            "description": "Parameters invalid"
+          },
+          "401": {
+            "description": "Unauthorized/user not authenticated"
+          },
+          "403": {
+            "description": "User does not have ownership of the resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Hello": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "Uid": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "description": "Uid of document. Autogenerated by database.",
+          "type": "string"
+        }
+      }
+    },
+    "PortfolioRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the portfolio."
+        }
+      }
+    },
+    "Portfolio": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Uid"
+        },
+        {
+          "$ref": "#/definitions/PortfolioRequest"
+        }
+      ]
+    },
+    "MoneyTransactionRequest": {
+      "type": "object",
+      "required": [
+        "sum"
+      ],
+      "properties": {
+        "sum": {
+          "type": "number",
+          "description": "Sum to be withdrawn (negative) or saved (position)"
+        }
+      }
+    },
+    "MoneyTransactionBalanceChange": {
+      "type": "object",
+      "required": [
+        "oldBalance",
+        "newBalance"
+      ],
+      "properties": {
+        "oldBalance": {
+          "type": "number",
+          "description": "Balance before transaction"
+        },
+        "newBalance": {
+          "type": "number",
+          "description": "Balance after transaction"
+        }
+      }
+    },
+    "MoneyTransaction": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Uid"
+        },
+        {
+          "$ref": "#/definitions/MoneyTransactionRequest"
+        },
+        {
+          "$ref": "#/definitions/MoneyTransactionBalanceChange"
+        }
+      ]
+    },
+    "TransactionRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Sell or buy",
+          "enum": [
+            "SELL",
+            "BUY"
+          ]
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Symbol of stock"
+        },
+        "amount": {
+          "type": "integer",
+          "description": "Amount of stocks",
+          "minimum": 1
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of single stock",
+          "minimum": 0,
+          "exclusiveMinimum": true
+        },
+        "expires": {
+          "type": "string",
+          "description": "Expiration time of the request",
+          "format": "yyyy-MM-ddTHH:mm:ss"
+        }
+      }
+    }
+  }
+}
