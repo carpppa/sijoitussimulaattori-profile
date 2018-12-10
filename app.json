@@ -1,0 +1,21 @@
+{
+  "name": "Sijoitussimulaattori Profile",
+  "description": "",
+  "scripts": {
+  },
+  "env": {
+    "NODE_ENV": "production",
+    "DEBUG": "TRUE"
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
