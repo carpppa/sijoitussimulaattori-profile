@@ -1,16 +1,18 @@
-import * as request from 'supertest';
 import 'jest';
+
+import * as request from 'supertest';
 
 import app from '../src/app';
 
 describe('Hello world', () => {
-  it('Hello world', async () => {
+  it('Hello world', async (done) => {
     const result = await request(app).get('/');
     expect(result.body.message).toEqual('Hello, World!');
     expect(result.status).toEqual(200);
+    done();
   });
 
-  it('Hello {name}', async () => {
+  it('Hello {name}', async (done) => {
     const body = {
       name: {
         first: 'John',
@@ -22,9 +24,10 @@ describe('Hello world', () => {
       .send(body);
     expect(result.body.message).toEqual('Hello, John!');
     expect(result.status).toEqual(200);
+    done();
   });
 
-  it('Hello {name} validation failure', async () => {
+  it('Hello {name} validation failure', async (done) => {
     const body = {
       name: {
         last: 'Doe',
@@ -36,5 +39,6 @@ describe('Hello world', () => {
     expect(result.body.statusCode).toEqual(400);
     expect(result.body.error).toEqual('Bad Request');
     expect(result.body.message).toContain('ValidationError');
+    done();
   });
 });

@@ -5,7 +5,7 @@ import * as request from 'supertest';
 import app from '../src/app';
 import { disconnectFirebase, initializeFirebase } from '../src/firebase';
 import { getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/firebase-test-utils';
-import { getDefinedOrThrow } from '../src/utils/general';
+import { getDefinedOrThrow, randomInt } from '../src/utils/general';
 import { getServiceAccount } from '../src/utils/get-service-account';
 
 describe('/auth/hello', () => {
@@ -20,7 +20,7 @@ describe('/auth/hello', () => {
 
     initializeFirebase(dbUrl, conf);
 
-    testUser = 'test-user-' + Math.round(Math.random() * 1000000).toString();
+    testUser = 'test-user-' + randomInt().toString();
     await getOrCreateUser(testUser);
     validToken = await getIdTokenForTest(apiKey, testUser);
     done();
