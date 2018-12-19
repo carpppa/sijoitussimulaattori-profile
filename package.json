@@ -42,6 +42,7 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "express-bearer-token": "^2.2.0",
     "express-boom": "^2.0.0",
     "express-joi-validation": "^0.3.0",
     "firebase-admin": "^6.3.0",
