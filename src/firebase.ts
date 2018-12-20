@@ -1,12 +1,6 @@
 import * as admin from 'firebase-admin';
 
-import { getDefinedOrThrow } from './utils/general';
-import { getServiceAccount } from './utils/get-service-account';
-
-interface FirebaseAdminConfig {
-  serviceAccount: admin.ServiceAccount;
-  databaseUrl: string;
-}
+import config from './config';
 
 /** Implements initialization logic for firebase-admin */
 class FirebaseAdmin {
@@ -21,7 +15,6 @@ class FirebaseAdmin {
   }
 
   app: admin.app.App;
-  conf?: FirebaseAdminConfig
 
   constructor() { }
 
@@ -33,20 +26,14 @@ class FirebaseAdmin {
 
   disconnect() {
     if (this.app !== undefined) {
-      this.conf = undefined;
       this.app.delete();
     }
   }
 
   private initializeConnection() {
-    this.conf = {
-      serviceAccount: getServiceAccount(),
-      databaseUrl: getDefinedOrThrow(process.env.DATABASE_URL)
-    }
-
     this.app = admin.initializeApp({
-      credential: admin.credential.cert(this.conf.serviceAccount),
-      databaseURL: this.conf.databaseUrl
+      credential: admin.credential.cert(config.firebase.SERVICE_ACCOUNT),
+      databaseURL:  config.firebase.DATABASE_URL
     })
   }
 }

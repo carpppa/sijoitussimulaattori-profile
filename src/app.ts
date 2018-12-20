@@ -3,10 +3,12 @@ import * as express from 'express';
 import * as Joi from 'joi';
 import * as boom from 'express-boom';
 import * as bearerToken from 'express-bearer-token';
+import * as expressWinston from 'express-winston';
 
 import { NextFunction, Request, Response } from 'express';
 import { Routes } from './routes';
 import { authErrorHandler } from './utils/firebase-express-auth';
+import { logger } from './utils/logger';
 
 interface JoiExpressError extends Error {
   error: Joi.ValidationError;
@@ -35,6 +37,15 @@ class App {
 
     // Bearer token parser
     this.app.use(bearerToken());
+
+    this.app.use(
+      expressWinston.logger({
+        winstonInstance: logger,
+        level: 'debug',
+        msg: 'HTTP {{req.method}} {{req.url}} {{res.statusCode}}',
+        colorize: true,
+      })
+    );
   }
 
   private config(): void {

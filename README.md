@@ -32,8 +32,9 @@ Install the following plugins:
 
 ## Enviroment
 
-- DEBUG
-  - `TRUE | FALSE`
+- NODE_ENV
+  - `production | development | test`
+- `LOG_LEVEL` : one of `winston` [log levels](https://github.com/winstonjs/winston#logging-levels) (optional, default value `info`)
 - `DATABASE_URL` && `WEB_API_KEY` can be found from firebase console -> project settings -> general.
   -  Database url will be of format `https://{public-facing-name}.firebaseio.com`
 - Following will be found from firebase console -> project settings -> service accounts -> generate new private key.

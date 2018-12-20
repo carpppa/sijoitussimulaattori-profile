@@ -3,9 +3,10 @@ import 'jest';
 import * as request from 'supertest';
 
 import app from '../src/app';
+import config from '../src/config';
 import * as firebase from '../src/firebase';
 import { getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/firebase-test-utils';
-import { getDefinedOrThrow, randomInt } from '../src/utils/general';
+import { randomInt } from '../src/utils/general';
 
 describe('/auth/hello', () => {
   let testUser: string;
@@ -14,7 +15,7 @@ describe('/auth/hello', () => {
   let validToken2: string;
 
   beforeAll(async (done) => {
-    const apiKey = getDefinedOrThrow(process.env.WEB_API_KEY);
+    const apiKey = config.firebase.WEB_API_KEY;
 
     firebase.connect();
 
