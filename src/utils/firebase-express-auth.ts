@@ -30,8 +30,14 @@ function authenticateRequest() {
       return next(new AuthenticationError('Authentication token is expired'));
     }
 
+    const [userErr, user] = await to(admin.auth().getUser(decodedToken.uid));
+
+    if(userErr || !user) {
+      return next(new AuthenticationError('Authenticated user not found'));
+    }
+
     req.identity = {
-      uid: decodedToken.uid
+      uid: user.uid
     };
 
     return next();

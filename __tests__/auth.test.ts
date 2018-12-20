@@ -10,6 +10,8 @@ import { getDefinedOrThrow, randomInt } from '../src/utils/general';
 describe('/auth/hello', () => {
   let testUser: string;
   let validToken: string;
+  let testUser2: string;
+  let validToken2: string;
 
   beforeAll(async (done) => {
     const apiKey = getDefinedOrThrow(process.env.WEB_API_KEY);
@@ -17,9 +19,21 @@ describe('/auth/hello', () => {
     firebase.connect();
 
     testUser = 'test-user-' + randomInt().toString();
-    await getOrCreateUser(testUser);
-    validToken = await getIdTokenForTest(apiKey, testUser);
+    testUser2 = 'test-user-' + randomInt().toString();
+    await Promise.all([
+      getOrCreateUser(testUser),
+      getOrCreateUser(testUser2),
+    ]);
+    await Promise.all([
+      getOrCreateUser(testUser),
+      getOrCreateUser(testUser2),
+    ]);
+    [validToken, validToken2] = await Promise.all([
+      getIdTokenForTest(apiKey, testUser),
+      getIdTokenForTest(apiKey, testUser2)
+    ])
 
+    await removeUser(testUser2);
     done();
   })
 
@@ -61,4 +75,15 @@ describe('/auth/hello', () => {
     expect(result.status).toEqual(200);
     done();
   });
+
+  it('GET should return 403 with token for non existing user', async (done) => {
+
+    const result = await request(app)
+      .get('/auth/hello')
+      .set('authorization', `Bearer ${validToken2}`);
+
+    expect(result.status).toEqual(403);
+    done();
+  });
+
 });
