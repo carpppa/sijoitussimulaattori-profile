@@ -25,10 +25,6 @@ describe('/auth/hello', () => {
       getOrCreateUser(testUser),
       getOrCreateUser(testUser2),
     ]);
-    await Promise.all([
-      getOrCreateUser(testUser),
-      getOrCreateUser(testUser2),
-    ]);
     [validToken, validToken2] = await Promise.all([
       getIdTokenForTest(apiKey, testUser),
       getIdTokenForTest(apiKey, testUser2)

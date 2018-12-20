@@ -3,15 +3,16 @@ import * as express from 'express';
 import * as validation from 'express-joi-validation';
 import * as swaggerUi from 'swagger-ui-express';
 
+import { deletePortfolio, getPortfolios, postPortfolio } from './controllers';
 import * as swaggerDocument from './docs/swagger.json';
-import { authenticateRequest } from './utils/firebase-express-auth';
-import { helloName } from './validation';
+import { helloSchema, portfolioSchema, portfolioWithUidSchema } from './models';
+import { authenticateRequest } from './utils';
 
 export class Routes {
   private validator = validation({ passError: true });
 
   public routes(app: express.Application): void {
-    
+
     app
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
@@ -25,7 +26,7 @@ export class Routes {
 
     app
       .route('/hello')
-      .get(this.validator.body(helloName), (req: Request, res: Response) => {
+      .get(this.validator.body(helloSchema), (req: Request, res: Response) => {
         res.status(200).send({
           message: `Hello, ${req.body.name.first}!`,
         });
@@ -39,5 +40,28 @@ export class Routes {
           uid: req.identity.uid,
         });
       })
+
+      app
+        .route('/profile/portfolio')
+        .get(
+          authenticateRequest(),
+          getPortfolios
+        );
+
+      app
+        .route('/profile/portfolio')
+        .post(
+          authenticateRequest(),
+          this.validator.body(portfolioSchema),
+          postPortfolio
+        );
+
+      app
+        .route('/profile/portfolio/:portfolioId')
+        .delete(
+          authenticateRequest(),
+          this.validator.params(portfolioWithUidSchema),
+          deletePortfolio
+        );
   }
 }

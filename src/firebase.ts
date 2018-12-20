@@ -34,7 +34,9 @@ class FirebaseAdmin {
     this.app = admin.initializeApp({
       credential: admin.credential.cert(config.firebase.SERVICE_ACCOUNT),
       databaseURL:  config.firebase.DATABASE_URL
-    })
+    });
+    // Removes warning about breaking change.
+    this.app.firestore().settings({timestampsInSnapshots: true});
   }
 }
 

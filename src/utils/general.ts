@@ -31,4 +31,12 @@ function getDefinedOrThrow<T>(entity: T | undefined): T {
     return entity;
 }
 
-export { ensureNecessaryEnvs, randomInt, getOrThrow, getDefinedOrThrow };
+function appendOrCreate<T>(arr: T[] | undefined, entity: T): T[] {
+  return arr ? [...arr, entity] : [entity];
+}
+
+function deleteOrEmpty<T>(arr: T[] | undefined, entity: T): T[] {
+  return arr ? arr.filter(t => t !== entity) : [];
+}
+
+export { ensureNecessaryEnvs, randomInt, getOrThrow, getDefinedOrThrow, appendOrCreate, deleteOrEmpty };
