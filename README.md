@@ -51,4 +51,7 @@ Install the following plugins:
 
 ## Dev-tools
 
-- `npm run generate:token` or `npm run generate:token -- UID=my-custom-user-uid` Generates/prints token which can be used for testing/calling endpoints behind authentication. Add generated token into authorization header. If user with that UID does not exists, creates one.
+- `npm run dev:create-user` or `npm run dev:create-user -- UID=my-custom-user-uid` Creates user to the database with given uid and prints authorization token for it.
+- `npm run dev:generate-token` or `npm run generate:token -- UID=my-custom-user-uid` Generates authorization token for given uid.
+- `npm run dev:generate-token` or `npm run generate:token -- UID=my-custom-user-uid` Removes user with given uid from the database. NOTE: At the moment does not remove any records for that user.
+
