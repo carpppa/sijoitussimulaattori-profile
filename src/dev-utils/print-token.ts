@@ -1,6 +1,5 @@
 import { runWithAdminContext } from '../firebase';
 import { getIdTokenForTest } from '../utils/firebase-test-utils';
-import { getServiceAccount } from '../utils/get-service-account';
 
 const dbUrl = process.env.DATABASE_URL;
 const apiKey = process.env.WEB_API_KEY;
@@ -27,7 +26,7 @@ function getUid() {
   return 'test-user-uid';
 }
 
-runWithAdminContext(dbUrl, getServiceAccount(), async (admin) => {
+runWithAdminContext(async (admin) => {
   const uid = getUid();
   const token = await getIdTokenForTest(apiKey, uid);
   console.log('-----------------------');

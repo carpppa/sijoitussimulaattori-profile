@@ -3,32 +3,30 @@ import 'jest';
 import * as request from 'supertest';
 
 import app from '../src/app';
-import { disconnectFirebase, initializeFirebase } from '../src/firebase';
+import * as firebase from '../src/firebase';
 import { getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/firebase-test-utils';
 import { getDefinedOrThrow, randomInt } from '../src/utils/general';
-import { getServiceAccount } from '../src/utils/get-service-account';
 
 describe('/auth/hello', () => {
   let testUser: string;
   let validToken: string;
 
   beforeAll(async (done) => {
-    const dbUrl = getDefinedOrThrow(process.env.DATABASE_URL);
     const apiKey = getDefinedOrThrow(process.env.WEB_API_KEY);
 
-    const conf = getServiceAccount();
-
-    initializeFirebase(dbUrl, conf);
+    firebase.connect();
 
     testUser = 'test-user-' + randomInt().toString();
     await getOrCreateUser(testUser);
     validToken = await getIdTokenForTest(apiKey, testUser);
+
     done();
   })
 
   afterAll(async (done) => {
     await removeUser(testUser);
-    disconnectFirebase();
+    firebase.disconnect();
+
     done();
   });
 
