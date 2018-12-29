@@ -9,6 +9,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Routes } from './routes';
 import { authErrorHandler } from './utils/firebase-express-auth';
 import { logger } from './utils/logger';
+import { notAccessableResourceErrorHandler } from './utils/firebase-ownership-middleware';
 
 interface JoiExpressError extends Error {
   error: Joi.ValidationError;
@@ -75,6 +76,9 @@ class App {
 
     // Authentication errors
     this.app.use(authErrorHandler());
+
+    // Resource ownership errors
+    this.app.use(notAccessableResourceErrorHandler())
   }
 }
 

@@ -444,6 +444,10 @@
             "ownerId": {
               "type": "string",
               "description": "Owner of the portfolio"
+            },
+            "balance": {
+              "type": "number",
+              "description": "Current balance of the portfolio"
             }
           }
         }

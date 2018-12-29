@@ -1,7 +1,19 @@
-import { DocumentSnapshot } from '@google-cloud/firestore';
+import { DocumentSnapshot, DocumentReference } from '@google-cloud/firestore';
+import * as admin from 'firebase-admin';
 
 export interface WithUid {
   uid: string;
+}
+
+/**
+ * This is a hack to make admin.firestore().getAll work more nicely. There is a bug which forces us to use syntax of
+ * firestore().getAll(head, ...tail) instead on firestore().getAll(...refs).
+ */
+function getAll(refs: DocumentReference[]): Promise<DocumentSnapshot[]> {
+    // This funny syntax is necessary because getAll typing has some kind of bug disallowing direct use of array.
+    const head = refs.shift()!; // non-null assertion because length has been checked earlier
+    const tail = refs;
+    return admin.firestore().getAll(head, ...tail);
 }
 
 function getData<T extends Object>(ref: DocumentSnapshot): T & WithUid {
@@ -21,4 +33,9 @@ function asUid(refOrUid: DocumentSnapshot | string): WithUid {
   return { uid: refOrUid.id };
 }
 
-export { getData, getDataArray, asUid }
+export { 
+  getAll,
+  getData,
+  getDataArray,
+  asUid,
+}

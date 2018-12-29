@@ -7,6 +7,7 @@ import { deletePortfolio, getPortfolios, postPortfolio } from './controllers';
 import * as swaggerDocument from './docs/swagger.json';
 import { helloSchema, portfolioSchema, portfolioWithUidSchema } from './models';
 import { authenticateRequest } from './utils';
+import { ensurePortfolioOwnership } from './utils/firebase-ownership-middleware';
 
 export class Routes {
   private validator = validation({ passError: true });
@@ -61,6 +62,7 @@ export class Routes {
         .delete(
           authenticateRequest(),
           this.validator.params(portfolioWithUidSchema),
+          ensurePortfolioOwnership(),
           deletePortfolio
         );
   }

@@ -14,6 +14,9 @@ import { WithUid } from './../src/utils/firebase-utils';
 
 describe('/profile/portfolio', () => {
   let validToken: string;
+  let validToken2: string;
+  let testUser: string;
+  let testUser2: string;
   const allPortfolios: { [key: string]: PortfolioWithUid } = { };
   const deletedKeys: string[] = [];
 
@@ -45,11 +48,21 @@ describe('/profile/portfolio', () => {
 
     firebase.connect();
 
-    const testUser = 'test-user-' + randomInt().toString();
+    testUser = 'test-user-' + randomInt().toString();
+    testUser2 = 'test-user-' + randomInt().toString();
     confs.users.created.push(testUser);
+    confs.users.created.push(testUser2);
 
-    await getOrCreateUser(testUser);
-    validToken = await getIdTokenForTest(config.firebase.WEB_API_KEY, testUser);
+    await Promise.all([
+      getOrCreateUser(testUser),
+      getOrCreateUser(testUser2),
+    ]);
+    const tokens = await Promise.all([
+      getIdTokenForTest(config.firebase.WEB_API_KEY, testUser),
+      getIdTokenForTest(config.firebase.WEB_API_KEY, testUser2)
+    ]);
+    validToken = tokens[0];
+    validToken2 = tokens[1];
 
     done();
   })
@@ -116,11 +129,11 @@ describe('/profile/portfolio', () => {
 
         expect(result.body).toBeDefined();
         expect(result.status).toEqual(200);
-        const created: Portfolio & WithUid = result.body;
+        const created: PortfolioWithUid = result.body;
         confs.portfolios.created.push(created.uid);
         expect(created.name).toEqual(portfolio.name);
         allPortfolios[created.uid] = created;
-
+        expect(created.balance).toEqual(0);
       }
       promises.push(createPortfolio());
     }
@@ -141,6 +154,32 @@ describe('/profile/portfolio', () => {
     const portfolios = result.body as PortfolioWithUid[];
     expect(portfolios).toHaveLength(confs.portfolios.create);
     expect(portfolios.map(pf => pf.uid)).toEqual(expect.arrayContaining(Object.keys(allPortfolios)));
+    portfolios.forEach(pf => {
+      expect(pf.balance).toEqual(0);
+      expect(pf.name).toBeDefined();
+      expect(pf.ownerId).toEqual(testUser);
+      expect(pf.uid).toBeDefined();
+    });
+    done();
+  });
+
+  it('DELETE should disallow deleting other users portfolios', async (done) => {
+
+    // Get some portfolios to be deleted
+    const deletePortfolios = Object.keys(allPortfolios).map(key => allPortfolios[key]);
+
+    const promises: Promise<void>[] = deletePortfolios.map(pf => {
+      const createDelete = async () => {
+        const result = await request(app)
+          .delete(`/profile/portfolio/${pf.uid}`)
+          .set('authorization', `Bearer ${validToken2}`);
+
+        expect(result.status).toEqual(403);
+      };
+      return createDelete();
+    });
+
+    await Promise.all(promises);
     done();
   });
 

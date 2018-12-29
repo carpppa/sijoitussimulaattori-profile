@@ -1,28 +1,21 @@
 import * as admin from 'firebase-admin';
 
-import { DB } from '../firebase-constants';
+import { DB, PORTFOLIO } from '../firebase-constants';
 import { Portfolio, PortfolioWithUid, PortfolioWithOwner } from '../models';
-import { asUid, getData, getDataArray, WithUid } from '../utils';
+import { asUid, getData, getDataArray, WithUid, getAll } from '../utils';
 
 async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]> {
   return admin.firestore().runTransaction(async (tx) => {
-    const portfolioQuery = await admin.firestore()
+    const query = await admin.firestore()
       .collection(DB.PORTFOLIOS)
-      .where("ownerId", "==", userId)
+      .where(PORTFOLIO.OWNERID, "==", userId)
       .get();
 
-    if (portfolioQuery.empty) {
+    if (query.empty) {
       return [];
     }
 
-    const portfolioDocs = portfolioQuery.docs.map(
-      doc => doc.ref
-    );
-
-    // This funny syntax is necessary because getAll typing has some kind of bug disallowing direct use of array.
-    const head = portfolioDocs.shift()!; // non-null assertion because length has been checked earlier
-    const tail = portfolioDocs;
-    const portfolios = await admin.firestore().getAll(head, ...tail);
+    const portfolios = await getAll(query.docs.map(d => d.ref));
 
     return getDataArray<PortfolioWithUid>(portfolios);
   })
@@ -32,7 +25,8 @@ async function createPortfolioForUser(userId: string, portfolio: Portfolio): Pro
   const createdId = await admin.firestore().runTransaction(async (tx) => {
     const portfolioWithOwner: PortfolioWithOwner = {
       ...portfolio,
-      ownerId: userId
+      ownerId: userId,
+      balance: 0,
     }
     const portfolioDoc = admin.firestore().collection(DB.PORTFOLIOS).doc();
     tx.set(portfolioDoc, portfolioWithOwner);
@@ -56,8 +50,21 @@ async function deletePortfolioFromUser(userId: string, portfolioId: string): Pro
   return asUid(deletedId);
 }
 
+async function portfolioBelongsToUser(userId: string, portfolioId: string): Promise<Boolean> {
+  const portfolioDoc = await admin.firestore().collection(DB.PORTFOLIOS).doc(portfolioId).get();
+
+  if (!portfolioDoc.exists) {
+    return false;
+  }
+
+  const portfolio = portfolioDoc.data() as PortfolioWithOwner;
+
+  return portfolio.ownerId ? userId === portfolio.ownerId : false;
+}
+
 export {
   createPortfolioForUser,
   deletePortfolioFromUser,
-  getPortfoliosForUser
+  getPortfoliosForUser,
+  portfolioBelongsToUser,
 }

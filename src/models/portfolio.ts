@@ -8,6 +8,7 @@ interface Portfolio {
 
 interface PortfolioWithOwner extends Portfolio {
   ownerId: string;
+  balance: number;
 }
 
 type PortfolioWithUid = PortfolioWithOwner & WithUid;
