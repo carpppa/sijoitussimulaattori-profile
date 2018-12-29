@@ -7,10 +7,9 @@ import app from '../src/app';
 import config from '../src/config';
 import * as firebase from '../src/firebase';
 import { DB } from '../src/firebase-constants';
-import { Portfolio, PortfolioWithUid, MoneyTransferWithUid, MoneyTransfer } from '../src/models';
+import { PortfolioWithUid, MoneyTransferWithUid, MoneyTransfer } from '../src/models';
 import { getIdTokenForTest, getOrCreateUser, createPortfolioForUser, shuffle, removeUser } from '../src/utils/firebase-test-utils';
 import { randomInt } from '../src/utils/general';
-import { WithUid } from './../src/utils/firebase-utils';
 
 describe('/profile/portfolio/balance', () => {
   let validToken: string;

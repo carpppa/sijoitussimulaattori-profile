@@ -40,7 +40,7 @@ async function createMoneytransferForPortfolio(portfolioId: string, transfer: Mo
     }
     
     tx.set(moneyTransfer.ref, calculatedTransfer);
-    tx.set(portfolioDoc.ref, {balance: newBalance}, {mergeFields: ['balance']})
+    tx.set(portfolioDoc.ref, {balance: newBalance}, {mergeFields: [PORTFOLIO.BALANCE]})
 
     return moneyTransfer.id;
   });
