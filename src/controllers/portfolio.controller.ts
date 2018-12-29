@@ -17,19 +17,29 @@ const getPortfolios = async (req: Request, res: Response) => {
 }
 
 const deletePortfolio = async (req: Request, res: Response) => {
-  const userId = req.identity.uid;
-  const portfolioId = req.params.portfolioId;
-
-  const deleted = await deletePortfolioFromUser(userId, portfolioId);
-  res.send(deleted);
+  try {
+    const userId = req.identity.uid;
+    const portfolioId = req.params.portfolioId;
+  
+    const deleted = await deletePortfolioFromUser(userId, portfolioId);
+    res.send(deleted);
+  } catch (error) {
+    logger.error('Delete portfolio failed: ', error.toString());
+    throw error;
+  }
 }
 
 const postPortfolio = async (req: Request, res: Response) => {
-  const userId = req.identity.uid;
-  const portfolio: Portfolio = req.body;
+  try {
+    const userId = req.identity.uid;
+    const portfolio: Portfolio = req.body;
 
-  const createdPortfolio = await createPortfolioForUser(userId, portfolio);
-  res.send(createdPortfolio);
+    const createdPortfolio = await createPortfolioForUser(userId, portfolio);
+    res.send(createdPortfolio);
+  } catch (error) {
+    logger.error('Post portfolios failed: ', error.toString());
+    throw error;
+  }
 }
 
 export {
