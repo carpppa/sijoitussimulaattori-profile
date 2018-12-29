@@ -10,8 +10,9 @@ const getTransactions = async (req: Request, res: Response) => {
 
     res.send(transactions).status(200);
   } catch (error) {
+    const err: Error = error;
     logger.error('Get transactions failed: ', error.toString());
-    throw error;
+    res.boom.badRequest(err.message)
   }
 }
 
@@ -24,8 +25,9 @@ const postTransaction = async (req: Request, res: Response) => {
 
     res.send(created).status(200);
   } catch (error) {
+    const err: Error = error;
     logger.error('Post transaction failed: ', error.toString());
-    throw error;
+    res.boom.badRequest(err.message)
   }
 }
 
@@ -36,8 +38,9 @@ const deleteTransaction = async (req: Request, res: Response) => {
 
     res.send(cancelled).status(200);
   } catch (error) {
+    const err: Error = error;
     logger.error('Delete transaction failed: ', error.toString());
-    throw error;
+    res.boom.badRequest(err.message)
   }
 }
 

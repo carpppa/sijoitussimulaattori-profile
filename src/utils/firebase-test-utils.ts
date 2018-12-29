@@ -24,11 +24,11 @@ async function getOrCreateUser(uid: string): Promise<admin.auth.UserRecord> {
   }
 }
 
-async function createPortfolioForUser(userId: string): Promise<string> {
+async function createPortfolioForUser(userId: string, balance: number = 0): Promise<string> {
   const doc = await admin.firestore().collection(DB.PORTFOLIOS).doc();
   const data: PortfolioWithOwner = {
     name: "test-portfolio",
-    balance: 0,
+    balance: balance,
     ownerId: userId
   }
   await doc.set(data);

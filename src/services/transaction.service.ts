@@ -20,6 +20,16 @@ async function getTransactionsForPortfolio(portfolioId: string): Promise<Transac
 }
 
 async function createTransactionForPortfolio(portfolioId: string, transaction: Transaction): Promise<TransactionWithUid> {
+  if(transaction.type === TransactionType.BUY) {
+    return createBuyTransactionForPortfolio(portfolioId, transaction);
+  } else if (transaction.type === TransactionType.SELL) {
+    return createSellTransactionForPortfolio(portfolioId, transaction);
+  } else {
+    throw new Error("Transaction type is incorrect.");
+  }
+}
+
+async function createBuyTransactionForPortfolio(portfolioId: string, transaction: Transaction): Promise<TransactionWithUid> {
   const transactionId = await admin.firestore().runTransaction(async (tx) => {
     const portfolioDoc = await tx.get(admin.firestore().collection(DB.PORTFOLIOS).doc(portfolioId));
 
@@ -27,8 +37,7 @@ async function createTransactionForPortfolio(portfolioId: string, transaction: T
     const transactionPrice = transaction.amount * transaction.price;
     const newBalance = balance - transactionPrice;
 
-    // Only check balance if transaction is BUY type.
-    if (transaction.type === TransactionType.BUY && newBalance < 0) {
+    if (newBalance < 0) {
       throw new Error("Portfolio balance is too low.");
     }
 
@@ -41,11 +50,7 @@ async function createTransactionForPortfolio(portfolioId: string, transaction: T
     };
 
     await tx.set(transactionDoc.ref, transactionExecuted);
-    
-    // Only alter balance if transaction is BUY type.
-    if (transaction.type === TransactionType.BUY) {
-      await tx.set(portfolioDoc.ref, { balance: newBalance}, {mergeFields: [PORTFOLIO.BALANCE] });
-    }
+    await tx.set(portfolioDoc.ref, { balance: newBalance}, {mergeFields: [PORTFOLIO.BALANCE] });
 
     return transactionDoc.id;
   });
@@ -55,35 +60,99 @@ async function createTransactionForPortfolio(portfolioId: string, transaction: T
   return getData<TransactionWithUid>(createdTransaction);
 }
 
-async function cancelTransaction(transactionId: string): Promise<TransactionWithUid> {
+async function createSellTransactionForPortfolio(portfolioId: string, transaction: Transaction): Promise<TransactionWithUid> {
+  const transactionId = await admin.firestore().runTransaction(async (tx) => {
+    const symbol = transaction.symbol;
+    const portfolioDoc = await tx.get(admin.firestore().collection(DB.PORTFOLIOS).doc(portfolioId));
+    const stockDoc = await tx.get(portfolioDoc.ref.collection(PORTFOLIO.STOCKS).doc(symbol));
+    
+    if (!stockDoc.exists) {
+      throw new Error("Cannot sell a stock that is not in portfolio.");
+    }
+
+    const stockAmount: number = await stockDoc.get(STOCK.AMOUNT) || 0;
+
+    if (stockAmount < transaction.amount) {
+      throw new Error("Not enough stocks to sell.");
+    }
+    
+    const transactionDoc = await tx.get(admin.firestore().collection(DB.TRANSACTIONS).doc());
+
+    const transactionExecuted: TransactionExecuted = {
+      ...transaction,
+      portfolioId,
+      status: TransactionStatus.MARKET
+    };
+
+    await tx.set(transactionDoc.ref, transactionExecuted);
+    
+    return transactionDoc.id;
+  });
+
+  const createdTransaction = await admin.firestore().collection(DB.TRANSACTIONS).doc(transactionId).get();
+
+  return getData<TransactionWithUid>(createdTransaction);
+}
+
+async function cancelTransaction(transactionId: string): Promise<TransactionWithUid> { 
+  const transactionDoc = await admin.firestore().collection(DB.TRANSACTIONS).doc(transactionId).get();
+  const type: TransactionType = transactionDoc.get(TRANSACTION.TYPE);
+  const status: TransactionStatus = transactionDoc.get(TRANSACTION.STATUS);
+
+  if (status === TransactionStatus.FULFILLED) {
+    throw new Error("Transaction cannot be cancelled: Transaction is already fulfilled");
+  }
+
+  if (status === TransactionStatus.CANCELLED) {
+    throw new Error("Transaction is already cancelled");
+  }
+
+  if (type === TransactionType.BUY) {
+    return cancelBuyTransaction(transactionId);
+  } else {
+    return cancelSellTransaction(transactionId);
+  }
+}
+
+async function cancelBuyTransaction(transactionId: string): Promise<TransactionWithUid> {
   const cancelledId = await admin.firestore().runTransaction(async (tx) => {
     const transactionDoc = await tx.get(admin.firestore().collection(DB.TRANSACTIONS).doc(transactionId));
     const portfolioId: string = await transactionDoc.get(TRANSACTION.PORTFOLIO_ID);
     const portfolioDoc = await tx.get(admin.firestore().collection(DB.PORTFOLIOS).doc(portfolioId));
 
-    const status: TransactionStatus = transactionDoc.get(TRANSACTION.STATUS);
-
-    if (status === TransactionStatus.FULFILLED) {
-      throw new Error("Transaction cannot be cancelled: Transaction is already fulfilled");
-    }
-
-    if (status === TransactionStatus.CANCELLED) {
-      throw new Error("Transaction is already cancelled");
-    }
-
-    const type: TransactionType = transactionDoc.get(TRANSACTION.TYPE)
     const amount: number = transactionDoc.get(TRANSACTION.AMOUNT);
     const price: number = transactionDoc.get(TRANSACTION.PRICE);
     const balance: number = portfolioDoc.get(PORTFOLIO.BALANCE);
 
+    // Refund price and set transaction to cancelled
+    const transactionPrice = amount * price;
+    const newBalance = balance + transactionPrice;
+    await tx.set(portfolioDoc.ref, { balance: newBalance}, {mergeFields: [PORTFOLIO.BALANCE] });
     await tx.set(transactionDoc.ref, { status: TransactionStatus.CANCELLED }, {mergeFields: [TRANSACTION.STATUS]});
-    // If transaction is of type BUY we should refund money to portfolio
-    if (type === TransactionType.BUY) {
-      const transactionPrice = amount * price;
-      const newBalance = balance + transactionPrice;
-      await tx.set(portfolioDoc.ref, { balance: newBalance}, {mergeFields: [PORTFOLIO.BALANCE] });
-    }
+    return transactionDoc.id;
+  });
 
+  const cancelledTransaction = await admin.firestore().collection(DB.TRANSACTIONS).doc(cancelledId).get();
+
+  return getData<TransactionWithUid>(cancelledTransaction);
+}
+
+async function cancelSellTransaction(transactionId: string): Promise<TransactionWithUid> {
+  const cancelledId = await admin.firestore().runTransaction(async (tx) => {
+    const transactionDoc = await tx.get(admin.firestore().collection(DB.TRANSACTIONS).doc(transactionId));
+    const portfolioId: string = await transactionDoc.get(TRANSACTION.PORTFOLIO_ID);
+    const portfolioDoc = await tx.get(admin.firestore().collection(DB.PORTFOLIOS).doc(portfolioId));
+
+    const symbol: string = await transactionDoc.get(TRANSACTION.SYMBOL);
+    const stockDoc = await tx.get(portfolioDoc.ref.collection(PORTFOLIO.STOCKS).doc(symbol));
+    
+    const sellAmount = transactionDoc.get(TRANSACTION.AMOUNT);
+    const oldAmount = stockDoc.get(STOCK.AMOUNT);
+    const newAmount = oldAmount + sellAmount;
+    
+    // Refund stock amount and set cancelled
+    await tx.set(stockDoc.ref, { amount: newAmount}, { mergeFields: [TRANSACTION.AMOUNT]});
+    await tx.set(transactionDoc.ref, { status: TransactionStatus.CANCELLED }, {mergeFields: [TRANSACTION.STATUS]});
     return transactionDoc.id;
   });
 
