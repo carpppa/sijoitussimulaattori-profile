@@ -191,7 +191,7 @@ describe('/profile/portfolio', () => {
           .delete(`/profile/portfolio/${pf.uid}`)
           .set('authorization', `Bearer ${validToken2}`);
 
-        expect(result.status).toEqual(403);
+        expect(result.status).toEqual(404);
       };
       return createDelete();
     });

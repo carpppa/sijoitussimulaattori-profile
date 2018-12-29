@@ -4,20 +4,20 @@ import * as admin from 'firebase-admin';
 import { portfolioBelongsToUser } from '../services';
 
 /** Class presents authentication error. Defines isAuthError property. */
-class NotAccessableResourceError extends Error {
-  public readonly isNotAccessableResourceError = true;
+class NotAccessibleResourceError extends Error {
+  public readonly isNotAccessibleResourceError = true;
 }
 
 /** Error handler for authentication errors */
 function notAccessableResourceErrorHandler() {
   return (
-    err: NotAccessableResourceError,
+    err: NotAccessibleResourceError,
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
-    if(err && err.isNotAccessableResourceError) {
-      res.boom.forbidden(err.message.toString());
+    if(err && err.isNotAccessibleResourceError) {
+      res.boom.notFound(err.message.toString());
     } else {
       next(err);
     }
@@ -35,7 +35,7 @@ function ensurePortfolioOwnership() {
     const isOwner = await portfolioBelongsToUser(userId, portfolioId);
 
     if(!isOwner) {
-      return next(new NotAccessableResourceError("Portfolio requested does not belong to the authenticated user."));
+      return next(new NotAccessibleResourceError("Portfolio requested does not belong to the authenticated user."));
     }
 
     return next();
@@ -44,6 +44,6 @@ function ensurePortfolioOwnership() {
 
 export {
   notAccessableResourceErrorHandler,
-  NotAccessableResourceError,
+  NotAccessibleResourceError,
   ensurePortfolioOwnership,
 }
