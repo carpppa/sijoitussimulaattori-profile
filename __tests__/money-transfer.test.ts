@@ -124,12 +124,12 @@ describe('/profile/portfolio/balance', () => {
     done();
   });
 
-  it('GET should return 403 without ownership to portfolio', async (done) => {
+  it('GET should return 404 without ownership to portfolio', async (done) => {
     const result = await request(app)
       .get(`/profile/portfolio/${portfolioId}/balance`)
       .set('authorization', `Bearer ${validToken2}`);
 
-    expect(result.status).toEqual(403);
+    expect(result.status).toEqual(404);
     done();
   });
 
