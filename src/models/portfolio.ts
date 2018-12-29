@@ -6,9 +6,7 @@ interface Portfolio {
   name: string;
 }
 
-interface PortfolioWithUid extends WithUid {
-
-}
+type PortfolioWithUid = Portfolio & WithUid;
 
 const portfolioSchema = Joi.object({
   name: Joi.string().required(),
