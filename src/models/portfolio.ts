@@ -6,7 +6,11 @@ interface Portfolio {
   name: string;
 }
 
-type PortfolioWithUid = Portfolio & WithUid;
+interface PortfolioWithOwner extends Portfolio {
+  ownerId: string;
+}
+
+type PortfolioWithUid = PortfolioWithOwner & WithUid;
 
 const portfolioSchema = Joi.object({
   name: Joi.string().required(),
@@ -17,4 +21,4 @@ const portfolioWithUidSchema = Joi.object({
   portfolioId: Joi.string().required(),
 })
 
-export { Portfolio, PortfolioWithUid, portfolioSchema, portfolioWithUidSchema };
+export { Portfolio, PortfolioWithUid, PortfolioWithOwner, portfolioSchema, portfolioWithUidSchema };

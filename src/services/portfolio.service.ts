@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 
 import { DB } from '../firebase-constants';
-import { Portfolio, UserData, PortfolioWithUid } from '../models';
+import { Portfolio, UserData, PortfolioWithUid, PortfolioWithOwner } from '../models';
 import { appendOrCreate, asUid, deleteOrEmpty, getData, getDataArray, WithUid } from '../utils';
 
 async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]> {
@@ -22,7 +22,7 @@ async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]>
     const tail = portfolioDocs;
     const portfolios = await admin.firestore().getAll(head, ...tail);
 
-    return getDataArray<Portfolio>(portfolios);
+    return getDataArray<PortfolioWithUid>(portfolios);
   })
 }
 
@@ -32,9 +32,13 @@ async function createPortfolioForUser(userId: string, portfolio: Portfolio): Pro
     const userDoc = admin.firestore().collection(DB.USERS).doc(userId);
     const oldUserData = getData<UserData>(await tx.get(userDoc));
     // Create portfolio
+    const portfolioWithOwner: PortfolioWithOwner = {
+      ...portfolio,
+      ownerId: userId
+    }
     const portfolioDoc = admin.firestore().collection(DB.PORTFOLIOS).doc();
-    tx.set(portfolioDoc, portfolio);
-
+    tx.set(portfolioDoc, portfolioWithOwner);
+    // Update user portfolios
     const newUserData: UserData = {
       portfolios: oldUserData ? appendOrCreate(oldUserData.portfolios, portfolioDoc.id) : [portfolioDoc.id]
     }
@@ -45,7 +49,7 @@ async function createPortfolioForUser(userId: string, portfolio: Portfolio): Pro
 
   const createdDoc = await admin.firestore().collection(DB.PORTFOLIOS).doc(createdId).get();
 
-  return getData<Portfolio>(createdDoc);
+  return getData<PortfolioWithUid>(createdDoc);
 }
 
 async function deletePortfolioFromUser(userId: string, portfolioId: string): Promise<WithUid> {
