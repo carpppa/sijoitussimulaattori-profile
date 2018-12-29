@@ -3,9 +3,9 @@ import * as express from 'express';
 import * as validation from 'express-joi-validation';
 import * as swaggerUi from 'swagger-ui-express';
 
-import { helloName } from './validation';
-
 import * as swaggerDocument from './docs/swagger.json';
+import { authenticateRequest } from './utils/firebase-express-auth';
+import { helloName } from './validation';
 
 export class Routes {
   private validator = validation({ passError: true });
@@ -30,5 +30,14 @@ export class Routes {
           message: `Hello, ${req.body.name.first}!`,
         });
       });
+
+    app
+      .route('/auth/hello')
+      .get(authenticateRequest(), (req: Request, res: Response) => {
+        res.status(200).send({
+          message: `Hello!`,
+          uid: req.identity.uid,
+        });
+      })
   }
 }

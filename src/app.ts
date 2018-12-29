@@ -2,8 +2,11 @@ import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as Joi from 'joi';
 import * as boom from 'express-boom';
+import * as bearerToken from 'express-bearer-token';
+
 import { NextFunction, Request, Response } from 'express';
 import { Routes } from './routes';
+import { authErrorHandler } from './utils/firebase-express-auth';
 
 interface JoiExpressError extends Error {
   error: Joi.ValidationError;
@@ -29,6 +32,9 @@ class App {
 
     // Boom HTTP errors
     this.app.use(boom());
+
+    // Bearer token parser
+    this.app.use(bearerToken());
   }
 
   private config(): void {
@@ -55,6 +61,9 @@ class App {
         }
       }
     );
+
+    // Authentication errors
+    this.app.use(authErrorHandler());
   }
 }
 
