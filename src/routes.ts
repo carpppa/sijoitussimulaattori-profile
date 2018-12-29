@@ -3,9 +3,9 @@ import * as express from 'express';
 import * as validation from 'express-joi-validation';
 import * as swaggerUi from 'swagger-ui-express';
 
-import { deletePortfolio, getPortfolios, postPortfolio, getPortfolio } from './controllers';
+import { deletePortfolio, getPortfolios, postPortfolio, getPortfolio, postTransaction, getTransactions, deleteTransaction } from './controllers';
 import * as swaggerDocument from './docs/swagger.json';
-import { helloSchema, portfolioSchema, portfolioIdSchema } from './models';
+import { helloSchema, portfolioSchema, portfolioIdSchema, transactionSchema, transactionIdSchema } from './models';
 import { authenticateRequest } from './utils';
 import { moneyTransferSchema } from './models/money-transfer';
 import { getMoneyTransfers, postMoneyTransfer } from './controllers/money-transfer.controller';
@@ -95,5 +95,34 @@ export class Routes {
           ensurePortfolioOwnership(),
           postMoneyTransfer
         );
+
+      app
+        .route('/profile/portfolio/:portfolioId/transaction')
+        .get(
+          authenticateRequest(),
+          this.validator.params(portfolioIdSchema),
+          ensurePortfolioOwnership(),
+          getTransactions
+        );
+        
+      app
+        .route('/profile/portfolio/:portfolioId/transaction')
+        .post(
+          authenticateRequest(),
+          this.validator.params(portfolioIdSchema),
+          this.validator.body(transactionSchema),
+          ensurePortfolioOwnership(),
+          postTransaction
+        );
+
+      app
+        .route('/profile/portfolio/:portfolioId/transaction/:transactionId')
+        .delete(
+          authenticateRequest(),
+          this.validator.params(transactionIdSchema),
+          ensurePortfolioOwnership(),
+          deleteTransaction
+        );
+
   }
 }
