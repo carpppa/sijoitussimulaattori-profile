@@ -1,6 +1,7 @@
 # Project
 dist/
 .env
+.env.test
 
 # Miscellaneous
 .DS_Store
@@ -23,3 +24,6 @@ node_modules/
 
 # Optional eslint cache
 .eslintcache
+
+# VScode
+.vscode

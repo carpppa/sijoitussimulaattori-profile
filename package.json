@@ -47,12 +47,15 @@
     "express-bearer-token": "^2.2.0",
     "express-boom": "^2.0.0",
     "express-joi-validation": "^0.3.0",
+    "express-winston": "^3.0.1",
     "firebase-admin": "^6.3.0",
     "joi": "^13.7.0",
-    "swagger-ui-express": "^4.0.1"
+    "swagger-ui-express": "^4.0.1",
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "@types/express": "^4.16.0",
+    "@types/express-winston": "^3.0.0",
     "@types/jest": "^23.3.5",
     "@types/joi": "^13.6.1",
     "@types/node": "^10.11.7",
