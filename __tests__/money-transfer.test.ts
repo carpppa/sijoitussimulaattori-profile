@@ -45,7 +45,7 @@ describe('/profile/portfolio/balance', () => {
         created: []
       },
       transfers: {
-        create: 3,
+        create: 4,
         created: []
       }
     }
@@ -185,7 +185,7 @@ describe('/profile/portfolio/balance', () => {
     balance += minus;
     await createRequest(minus);
     done();
-  });
+  }, 10000);
 
   it('GET should list money transfers', async (done) => {
     const result = await request(app)
