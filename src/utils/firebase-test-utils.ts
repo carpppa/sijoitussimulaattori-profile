@@ -1,5 +1,7 @@
 import axios from 'axios';
 import * as admin from 'firebase-admin';
+import { DB } from '../firebase-constants';
+import { PortfolioWithOwner } from '../models';
 
 interface VerifyCustomTokenResponse {
   kind: string;
@@ -22,6 +24,16 @@ async function getOrCreateUser(uid: string): Promise<admin.auth.UserRecord> {
   }
 }
 
+async function createPortfolioForUser(userId: string): Promise<string> {
+  const doc = await admin.firestore().collection(DB.PORTFOLIOS).doc();
+  const data: PortfolioWithOwner = {
+    name: "test-portfolio",
+    balance: 0,
+    ownerId: userId
+  }
+  await doc.set(data);
+  return doc.id;
+}
 /**
  * Returns IdToken which can be used to login as provided user/uid. Is meant only for testing purposes.
  *
@@ -54,8 +66,24 @@ async function removeUser(uid: string): Promise<void> {
   await admin.auth().deleteUser(uid);
 }
 
+/**
+ * Shuffles array in place.
+ * @param {Array} a items An array containing the items.
+ */
+function shuffle<T>(a: T[]) {
+  var j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
+      x = a[i];
+      a[i] = a[j];
+      a[j] = x;
+  }
+  return a;
+}
 export {
   getOrCreateUser,
   getIdTokenForTest,
   removeUser,
+  createPortfolioForUser,
+  shuffle,
 }

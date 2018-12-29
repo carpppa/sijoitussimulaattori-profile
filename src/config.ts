@@ -1,4 +1,5 @@
-import { ensureNecessaryEnvs, getServiceAccount } from './utils';
+import { ensureNecessaryEnvs } from './utils/general';
+import { getServiceAccount } from './utils/get-service-account';
 
 process.on('uncaughtException', (err) => {
   console.log('\x1b[31m', 'error: uncaught exception:', err);
@@ -14,7 +15,7 @@ ensureNecessaryEnvs([
 const config = {
   app: {
     NODE_ENV: process.env.NODE_ENV || 'development',
-    LOGGER_LEVEL: process.env.LOG_LEVEL || 'info',
+    LOG_LEVEL: process.env.LOG_LEVEL || 'info',
   },
   firebase: {
     SERVICE_ACCOUNT: getServiceAccount(),

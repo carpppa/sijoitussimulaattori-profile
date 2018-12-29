@@ -8,7 +8,7 @@ import config from '../src/config';
 import * as firebase from '../src/firebase';
 import { DB } from '../src/firebase-constants';
 import { Portfolio, PortfolioWithUid } from '../src/models';
-import { getIdTokenForTest, getOrCreateUser } from '../src/utils/firebase-test-utils';
+import { getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/firebase-test-utils';
 import { randomInt } from '../src/utils/general';
 import { WithUid } from './../src/utils/firebase-utils';
 
@@ -75,7 +75,11 @@ describe('/profile/portfolio', () => {
       return admin.firestore().collection(DB.USERS).doc(puid).delete();
     })
 
-    await Promise.all([...portfolioDocs, ...userDocs]);
+    const users = confs.users.created.map(uid => {
+      return removeUser(uid);
+    })
+
+    await Promise.all<any>([...portfolioDocs, ...userDocs, ...users]);
 
     firebase.disconnect();
     done();

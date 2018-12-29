@@ -1,7 +1,7 @@
 import { DocumentSnapshot, DocumentReference } from '@google-cloud/firestore';
 import * as admin from 'firebase-admin';
 
-export interface WithUid {
+interface WithUid {
   uid: string;
 }
 
@@ -38,4 +38,5 @@ export {
   getData,
   getDataArray,
   asUid,
+  WithUid,
 }
