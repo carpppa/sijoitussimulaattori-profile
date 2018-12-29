@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { Portfolio } from '../models';
-import { createPortfolioForUser, deletePortfolioFromUser, getPortfoliosForUser } from '../services';
+import { createPortfolioForUser, deletePortfolioFromUser, getPortfoliosForUser, getPortfolioById } from '../services';
 import { logger } from '../utils';
 
 const getPortfolios = async (req: Request, res: Response) => {
@@ -12,6 +12,18 @@ const getPortfolios = async (req: Request, res: Response) => {
     res.send(portfolios).status(200);
   } catch (error) {
     logger.error('Get portfolios failed: ', error.toString());
+    throw error;
+  }
+}
+
+const getPortfolio = async (req: Request, res: Response) => {
+  try {
+    const portfolioId = req.params.portfolioId;
+    const portfolio = await getPortfolioById(portfolioId);
+
+    res.send(portfolio).status(200);
+  } catch (error) {
+    logger.error('Get portfolio failed: ', error.toString());
     throw error;
   }
 }
@@ -44,6 +56,7 @@ const postPortfolio = async (req: Request, res: Response) => {
 
 export {
   getPortfolios,
+  getPortfolio,
   postPortfolio,
   deletePortfolio
 }

@@ -18,8 +18,8 @@ const portfolioSchema = Joi.object({
   uid: Joi.string(),
 });
 
-const portfolioWithUidSchema = Joi.object({
+const portfolioIdSchema = Joi.object({
   portfolioId: Joi.string().required(),
 })
 
-export { Portfolio, PortfolioWithUid, PortfolioWithOwner, portfolioSchema, portfolioWithUidSchema };
+export { Portfolio, PortfolioWithUid, PortfolioWithOwner, portfolioSchema, portfolioIdSchema };

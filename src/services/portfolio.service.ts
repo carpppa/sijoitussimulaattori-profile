@@ -21,6 +21,16 @@ async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]>
   })
 }
 
+async function getPortfolioById(portfolioId: string): Promise<PortfolioWithUid> {
+  const doc = await admin.firestore().collection(DB.PORTFOLIOS).doc(portfolioId).get();
+
+  if (!doc.exists) {
+    throw new Error("Requested portfolio does not exists");
+  }
+
+  return getData<PortfolioWithUid>(doc);
+}
+
 async function createPortfolioForUser(userId: string, portfolio: Portfolio): Promise<PortfolioWithUid> {
   const createdId = await admin.firestore().runTransaction(async (tx) => {
     const portfolioWithOwner: PortfolioWithOwner = {
@@ -66,5 +76,6 @@ export {
   createPortfolioForUser,
   deletePortfolioFromUser,
   getPortfoliosForUser,
+  getPortfolioById,
   portfolioBelongsToUser,
 }

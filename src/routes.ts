@@ -3,9 +3,9 @@ import * as express from 'express';
 import * as validation from 'express-joi-validation';
 import * as swaggerUi from 'swagger-ui-express';
 
-import { deletePortfolio, getPortfolios, postPortfolio } from './controllers';
+import { deletePortfolio, getPortfolios, postPortfolio, getPortfolio } from './controllers';
 import * as swaggerDocument from './docs/swagger.json';
-import { helloSchema, portfolioSchema, portfolioWithUidSchema } from './models';
+import { helloSchema, portfolioSchema, portfolioIdSchema } from './models';
 import { authenticateRequest } from './utils';
 import { ensurePortfolioOwnership } from './utils/firebase-ownership-middleware';
 
@@ -61,9 +61,18 @@ export class Routes {
         .route('/profile/portfolio/:portfolioId')
         .delete(
           authenticateRequest(),
-          this.validator.params(portfolioWithUidSchema),
+          this.validator.params(portfolioIdSchema),
           ensurePortfolioOwnership(),
           deletePortfolio
+        );
+
+      app
+        .route('/profile/portfolio/:portfolioId')
+        .get(
+          authenticateRequest(),
+          this.validator.params(portfolioIdSchema),
+          ensurePortfolioOwnership(),
+          getPortfolio
         );
   }
 }

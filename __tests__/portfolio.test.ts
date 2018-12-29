@@ -143,6 +143,23 @@ describe('/profile/portfolio', () => {
     done();
   });
 
+  it('GET with id should return single portfolio', async (done) => {
+    const createdPortfolio = confs.portfolios.created[0];
+
+    const result = await request(app)
+      .get(`/profile/portfolio/${createdPortfolio}`)
+      .set('authorization', `Bearer ${validToken}`);
+
+    expect(result.status).toEqual(200);
+    expect(result.body).toBeDefined();
+    const pf = result.body as PortfolioWithUid;
+    expect(pf.balance).toEqual(0);
+    expect(pf.name).toBeDefined();
+    expect(pf.ownerId).toEqual(testUser);
+    expect(pf.uid).toBeDefined();
+    done();
+  });
+
   it('GET should return created portfolios', async (done) => {
     const result = await request(app)
       .get('/profile/portfolio')
