@@ -45,7 +45,7 @@ describe('/profile/portfolio/balance', () => {
         created: []
       },
       transfers: {
-        create: 5,
+        create: 3,
         created: []
       }
     }
@@ -174,7 +174,7 @@ describe('/profile/portfolio/balance', () => {
     };
 
     for(let i = 0; i < confs.transfers.create - 1; i++) {
-      const sum = i * 100;
+      const sum = i * 200;
       balance += sum;
       requests.push(createRequest(sum));
     }
