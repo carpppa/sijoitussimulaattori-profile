@@ -4,7 +4,7 @@ import { DB } from '../firebase-constants';
 import { Portfolio, UserData } from '../models';
 import { appendOrCreate, asUid, deleteOrEmpty, getData, getDataArray, WithUid } from '../utils';
 
-async function getPortfoliosForUser(userId: string): Promise<Portfolio[]> {
+async function getPortfoliosForUser(userId: string): Promise<(Portfolio & WithUid)[]> {
   return admin.firestore().runTransaction(async (tx) => {
     // Get user
     const userDoc = admin.firestore().collection(DB.USERS).doc(userId);
@@ -26,7 +26,7 @@ async function getPortfoliosForUser(userId: string): Promise<Portfolio[]> {
   })
 }
 
-async function createPortfolioForUser(userId: string, portfolio: Portfolio): Promise<Portfolio> {
+async function createPortfolioForUser(userId: string, portfolio: Portfolio): Promise<Portfolio & WithUid> {
   const createdId = await admin.firestore().runTransaction(async (tx) => {
     // Get user portfolios
     const userDoc = admin.firestore().collection(DB.USERS).doc(userId);
