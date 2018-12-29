@@ -400,4 +400,24 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     done();
   });
 
+  it('DELETE of fulfilled transaction should return 400 ', async (done) => {
+    const result1 = await request(app)
+      .get(`/profile/portfolio/${portfolioId}/transaction`)
+      .set('authorization', `Bearer ${validToken}`);
+
+    expect(result1.status).toEqual(200);
+    expect(Array.isArray(result1.body)).toBeTruthy();
+    const transactions1 = result1.body as TransactionWithUid[];
+    expect(transactions1).toHaveLength(2);
+
+    const transaction1 = transactions1.find(tr => tr.type === TransactionType.SELL)!;
+    expect(transaction1.status).toEqual(TransactionStatus.FULFILLED);
+
+    const result2 = await request(app)
+      .delete(`/profile/portfolio/${portfolioId}/transaction/${transaction1}`)
+      .set('authorization', `Bearer ${validToken}`);
+
+    expect(result2.status).toEqual(400);
+    done();
+  });
 });
