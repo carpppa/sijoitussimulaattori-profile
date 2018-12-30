@@ -4,7 +4,7 @@ import winston = require('winston');
 import config from '../config';
 
 const logger: winston.Logger = createLogger({
-  level: config.app.LOGGER_LEVEL,
+  level: config.app.LOG_LEVEL,
   format: format.combine(
     format.colorize({
       all: config.app.NODE_ENV !== 'production',

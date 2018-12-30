@@ -39,4 +39,11 @@ function deleteOrEmpty<T>(arr: T[] | undefined, entity: T): T[] {
   return arr ? arr.filter(t => t !== entity) : [];
 }
 
-export { ensureNecessaryEnvs, randomInt, getOrThrow, getDefinedOrThrow, appendOrCreate, deleteOrEmpty };
+export { 
+  ensureNecessaryEnvs,
+  randomInt,
+  getOrThrow,
+  getDefinedOrThrow,
+  appendOrCreate,
+  deleteOrEmpty
+};

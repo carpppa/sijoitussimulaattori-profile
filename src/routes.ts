@@ -7,6 +7,8 @@ import { deletePortfolio, getPortfolios, postPortfolio, getPortfolio } from './c
 import * as swaggerDocument from './docs/swagger.json';
 import { helloSchema, portfolioSchema, portfolioIdSchema } from './models';
 import { authenticateRequest } from './utils';
+import { moneyTransferSchema } from './models/money-transfer';
+import { getMoneyTransfers, postMoneyTransfer } from './controllers/money-transfer.controller';
 import { ensurePortfolioOwnership } from './utils/firebase-ownership-middleware';
 
 export class Routes {
@@ -73,6 +75,25 @@ export class Routes {
           this.validator.params(portfolioIdSchema),
           ensurePortfolioOwnership(),
           getPortfolio
+        );
+
+      app
+        .route('/profile/portfolio/:portfolioId/balance')
+        .get(
+          authenticateRequest(),
+          this.validator.params(portfolioIdSchema),
+          ensurePortfolioOwnership(),
+          getMoneyTransfers
+        );
+
+      app
+        .route('/profile/portfolio/:portfolioId/balance')
+        .post(
+          authenticateRequest(),
+          this.validator.params(portfolioIdSchema),
+          this.validator.body(moneyTransferSchema),
+          ensurePortfolioOwnership(),
+          postMoneyTransfer
         );
   }
 }
