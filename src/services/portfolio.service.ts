@@ -1,8 +1,9 @@
 import * as admin from 'firebase-admin';
 
 import { DB, PORTFOLIO } from '../firebase-constants';
-import { Portfolio, PortfolioWithUid, PortfolioWithOwner } from '../models';
-import { asUid, getData, getDataArray, WithUid, getAll } from '../utils';
+import { Portfolio, PortfolioWithOwner, PortfolioWithUid } from '../models';
+import { asUid, getAll, getData, getDataArray, WithUid } from '../utils';
+import { getStocksOfPortfolio } from './portfolio-stocks.service';
 
 async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]> {
   return admin.firestore().runTransaction(async (tx) => {
@@ -28,7 +29,10 @@ async function getPortfolioById(portfolioId: string): Promise<PortfolioWithUid> 
     throw new Error("Requested portfolio does not exists");
   }
 
-  return getData<PortfolioWithUid>(doc);
+  const portfolio = await getData<PortfolioWithUid>(doc);
+  portfolio.stocks = await getStocksOfPortfolio(portfolioId);
+
+  return portfolio;
 }
 
 async function createPortfolioForUser(userId: string, portfolio: Portfolio): Promise<PortfolioWithUid> {

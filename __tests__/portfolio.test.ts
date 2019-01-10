@@ -161,6 +161,7 @@ describe('/profile/portfolio', () => {
     expect(pf.name).toBeDefined();
     expect(pf.ownerId).toEqual(testUser);
     expect(pf.uid).toBeDefined();
+    expect(pf.stocks).toBeDefined();
     done();
   });
 

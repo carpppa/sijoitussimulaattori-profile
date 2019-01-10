@@ -109,7 +109,7 @@ describe('/profile/portfolio/balance', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, 10000);
 
   it('GET should return 403 with invalid token', async (done) => {
 
@@ -121,7 +121,7 @@ describe('/profile/portfolio/balance', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, 10000);
 
   it('GET should return 404 without ownership to portfolio', async (done) => {
     const result = await request(app)
@@ -130,7 +130,7 @@ describe('/profile/portfolio/balance', () => {
 
     expect(result.status).toEqual(404);
     done();
-  });
+  }, 10000);
 
   it('GET should return empty list', async (done) => {
     const result = await request(app)
@@ -142,7 +142,7 @@ describe('/profile/portfolio/balance', () => {
     const portfolios = result.body as MoneyTransferWithUid[];
     expect(portfolios).toHaveLength(0);
     done();
-  });
+  }, 10000);
 
   it('POST should create money transfers', async (done) => {
     const requests: Promise<void>[] = [];
@@ -197,7 +197,7 @@ describe('/profile/portfolio/balance', () => {
     expect(transfers).toHaveLength(confs.transfers.create);
     expect(result.status).toEqual(200);
     done();
-  });
+  }, 10000);
 
   it('POST new transfer should reject if balance would end up negative', async (done) => {
     const transfer: MoneyTransfer = {
@@ -211,7 +211,7 @@ describe('/profile/portfolio/balance', () => {
 
     expect(result.status).toEqual(400)
     done();
-  });
+  }, 10000);
 
   it('POST should have altered balance of the portfolio', async (done) => {
     const result = await request(app)
@@ -226,6 +226,6 @@ describe('/profile/portfolio/balance', () => {
     expect(pf.ownerId).toEqual(testUser);
     expect(pf.uid).toBeDefined();
     done();
-  });
+  }, 10000);
 
 });

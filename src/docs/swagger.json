@@ -108,6 +108,44 @@
       }
     },
     "/profile/portfolio/{portfolioId}": {
+      "get": {
+        "tags": [
+          "Portfolio"
+        ],
+        "summary": "Get portfolio",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolioId",
+            "required": true,
+            "type": "string",
+            "description": "Portfolio where action is requested from"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Portfolio was found",
+            "schema": {
+              "$ref": "#/definitions/PortfolioWithStocks"
+            }
+          },
+          "400": {
+            "description": "Parameters invalid"
+          },
+          "401": {
+            "description": "Unauthorized/user not authenticated"
+          },
+          "403": {
+            "description": "User does not have ownership of the resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Portfolio"
@@ -448,6 +486,50 @@
             "balance": {
               "type": "number",
               "description": "Current balance of the portfolio"
+            }
+          }
+        }
+      ]
+    },
+    "Stock": {
+      "type": "object",
+      "required": [
+        "amount",
+        "avgPrice"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Uid"
+        },
+        {
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Amount of owned stocks"
+            },
+            "avgPrice": {
+              "type": "number",
+              "description": "Average buy price of owned stocks"
+            }
+          }
+        }
+      ]
+    },
+    "PortfolioWithStocks": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Portfolio"
+        },
+        {
+          "properties": {
+            "stocks": {
+              "type": "array",
+              "items": [
+                {
+                  "$ref": "#/definitions/Stock"
+                }
+              ]
             }
           }
         }

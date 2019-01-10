@@ -7,10 +7,11 @@ import app from '../src/app';
 import config from '../src/config';
 import * as firebase from '../src/firebase';
 import { DB, PORTFOLIO } from '../src/firebase-constants';
-import { PortfolioWithUid, TransactionWithUid, Transaction, TransactionType, TransactionStatus } from '../src/models';
-import { getIdTokenForTest, getOrCreateUser, createPortfolioForUser, removeUser } from '../src/utils/firebase-test-utils';
-import { randomInt } from '../src/utils/general';
+import { PortfolioWithUid, Transaction, TransactionStatus, TransactionType, TransactionWithUid } from '../src/models';
+import { StockInPortfolioWithUid } from '../src/models/stock';
 import { fulfillTransaction } from '../src/services';
+import { createPortfolioForUser, getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/firebase-test-utils';
+import { randomInt } from '../src/utils/general';
 
 describe('/profile/portfolio/:portfolioId/transaction', () => {
   let validToken: string;
@@ -372,6 +373,26 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     done();
   });
 
+  it('GET with id should return single portfolio with stocks', async (done) => {
+    const result = await request(app)
+      .get(`/profile/portfolio/${portfolioId}`)
+      .set('authorization', `Bearer ${validToken}`);
+
+    expect(result.status).toEqual(200);
+    expect(result.body).toBeDefined();
+    const pf = result.body as PortfolioWithUid;
+    expect(pf.balance).toBeDefined();
+    expect(pf.name).toBeDefined();
+    expect(pf.ownerId).toEqual(testUser);
+    expect(pf.uid).toBeDefined();
+    expect(pf.stocks).toBeDefined();
+    const stocks = pf.stocks as StockInPortfolioWithUid[];
+    expect(stocks.length).toBe(1);
+    expect(stocks[0].amount).toBe(20);
+    expect(stocks[0].avgPrice).toBe(50);
+    done();
+  });
+
   it('Fulfilling SELL transaction should alter balance of portfolio', async (done) => {
     const result1 = await request(app)
       .get(`/profile/portfolio/${portfolioId}/transaction`)
@@ -399,6 +420,27 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     done();
   });
+
+  it('GET with id should return single portfolio with stocks updated after sell', async (done) => {
+    const result = await request(app)
+      .get(`/profile/portfolio/${portfolioId}`)
+      .set('authorization', `Bearer ${validToken}`);
+
+    expect(result.status).toEqual(200);
+    expect(result.body).toBeDefined();
+    const pf = result.body as PortfolioWithUid;
+    expect(pf.balance).toBeDefined();
+    expect(pf.name).toBeDefined();
+    expect(pf.ownerId).toEqual(testUser);
+    expect(pf.uid).toBeDefined();
+    expect(pf.stocks).toBeDefined();
+    const stocks = pf.stocks as StockInPortfolioWithUid[];
+    expect(stocks.length).toBe(1);
+    expect(stocks[0].amount).toBe(15);
+    expect(stocks[0].avgPrice).toBe(50);
+    done();
+  });
+
 
   it('DELETE of fulfilled transaction should return 400 ', async (done) => {
     const result1 = await request(app)
