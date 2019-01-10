@@ -302,6 +302,10 @@ definitions:
       name:
         type: "string"
         description: "Name of the portfolio."
+      balance:
+        type: "number"
+        description: "Initial balance of the portfolio"
+        default: 0
         
   Portfolio:
     type: "object"
