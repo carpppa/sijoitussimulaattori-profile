@@ -20,6 +20,7 @@ export const TRANSFER = {
   NEW_BALANCE: 'newBalance',
   SUM: 'sum',
   PORTFOLIO_ID: 'portfolioId',
+  CREATED_AT: 'createdAt',
 };
 
 export const TRANSACTION = {
@@ -29,9 +30,12 @@ export const TRANSACTION = {
   PRICE: 'price',
   AMOUNT: 'amount',
   TYPE: 'type',
+  CREATED_AT: 'createdAt',
+  FULFILLED_AT: 'fulfilledAt',
+  CANCELLED_AT: 'cancelledAt',
 }
 
 export const STOCK = {
   AMOUNT: 'amount',
-  AVG_PRICE: 'avgPrice'
+  AVG_PRICE: 'avgPrice',
 }

@@ -89,7 +89,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     confs.portfolios.created.push(portfolioId2);
 
     done();
-  })
+  }, TEST_TIMEOUT);
 
   afterAll(async (done) => {
     const deleteStocks: Promise<any>[] = [];
@@ -119,7 +119,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     firebase.disconnect();
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return 403 without authentication', async (done) => {
     const result = await request(app)
@@ -167,7 +167,8 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
       type: TransactionType.BUY,
       amount: 11,
       price: 100,
-      symbol: 'FAKE-STOCK'
+      symbol: 'FAKE-STOCK',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     }
 
     const result = await request(app)
@@ -184,21 +185,24 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
       type: TransactionType.BUY,
       amount: 10,
       price: -100,
-      symbol: 'FAKE-STOCK'
+      symbol: 'FAKE-STOCK',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     }
 
     const transaction2: Transaction = {
       type: TransactionType.BUY,
       amount: -10,
       price: 100,
-      symbol: 'FAKE-STOCK'
+      symbol: 'FAKE-STOCK',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     }
 
     const transaction3: any = {
       type: 'NOT_TRANSACTION_TYPE',
       amount: -10,
       price: 100,
-      symbol: 'FAKE-STOCK'
+      symbol: 'FAKE-STOCK',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     }
 
     const transaction4: any = {
@@ -236,12 +240,13 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     done();
   }, TEST_TIMEOUT);
 
-  it('POST should return 400 stock under sell is not in portfolio', async (done) => {
+  it('POST should return 400 when stock under sell is not found in portfolio', async (done) => {
     const transaction1: Transaction = {
       type: TransactionType.SELL,
       amount: 10,
       price: 50,
-      symbol: 'SELLED-STOCK'
+      symbol: 'SELLED-STOCK',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     }
 
     const result = await request(app)
@@ -259,7 +264,8 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
       type: TransactionType.BUY,
       amount: 10,
       price: 50,
-      symbol: 'WANTED-STOCK'
+      symbol: 'WANTED-STOCK',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     }
 
     const result = await request(app)
@@ -278,6 +284,9 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(inMarket.type).toEqual(transaction1.type);
     expect(inMarket.portfolioId).toEqual(portfolioId);
     expect(inMarket.status).toEqual(TransactionStatus.MARKET);
+    expect(inMarket.createdAt).toBeDefined();
+    expect(inMarket.fulfilledAt).toBeUndefined();
+    expect(inMarket.cancelledAt).toBeUndefined();
 
     // Check balance
 
@@ -318,6 +327,8 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     const transaction1 = transactions1[0];
     expect(transaction1.status).toEqual(TransactionStatus.MARKET);
+    expect(transaction1.fulfilledAt).toBeUndefined();
+    expect(transaction1.cancelledAt).toBeUndefined();
 
     await fulfillTransaction(transaction1.uid);
 
@@ -332,6 +343,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     const transaction2 = transactions2[0];
     expect(transaction2.status).toEqual(TransactionStatus.FULFILLED);
+    expect(transaction2.fulfilledAt).toBeDefined();
     done();
   }, TEST_TIMEOUT);
 
@@ -355,7 +367,8 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
       type: TransactionType.SELL,
       amount: 5,
       price: 50,
-      symbol: 'WANTED-STOCK'
+      symbol: 'WANTED-STOCK',
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     }
 
     const result = await request(app)
@@ -372,6 +385,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(inMarket.symbol).toEqual(transaction2.symbol);
     expect(inMarket.uid).toBeDefined();
     expect(inMarket.status).toEqual(TransactionStatus.MARKET);
+    expect(inMarket.expiresAt).toBeDefined();
     done();
   }, TEST_TIMEOUT);
 

@@ -1,12 +1,12 @@
 import * as Joi from 'joi';
 
-import { WithUid } from './../utils/firebase-utils';
+import { CreatedAt, WithUid } from './../utils/firebase-utils';
 
 interface MoneyTransfer {
   sum: number;
 }
 
-interface MoneyTransferExecuted extends MoneyTransfer {
+interface MoneyTransferExecuted extends MoneyTransfer, CreatedAt {
   portfolioId: string;
   oldBalance: number;
   newBalance: number;

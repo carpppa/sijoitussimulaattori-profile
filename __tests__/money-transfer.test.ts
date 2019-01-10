@@ -88,7 +88,7 @@ describe('/profile/portfolio/balance', () => {
     confs.portfolios.created.push(portfolioId2);
 
     done();
-  })
+  }, TEST_TIMEOUT);
 
   afterAll(async (done) => {
     const portfolioDocs = confs.portfolios.created.map(puid => {
@@ -109,7 +109,7 @@ describe('/profile/portfolio/balance', () => {
 
     firebase.disconnect();
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return 403 without authentication', async (done) => {
     const result = await request(app)
@@ -178,6 +178,7 @@ describe('/profile/portfolio/balance', () => {
       expect(executed.oldBalance).toBeDefined();
       expect(executed.newBalance).toEqual(executed.oldBalance + executed.sum);
       expect(executed.sum).toEqual(executed.newBalance - executed.oldBalance);
+      expect(executed.createdAt).toBeDefined();
     };
 
     for(let i = 0; i < confs.transfers.create - 1; i++) {

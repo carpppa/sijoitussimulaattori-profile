@@ -1,8 +1,14 @@
-import { DocumentSnapshot, DocumentReference } from '@google-cloud/firestore';
+import { DocumentReference, DocumentSnapshot, Timestamp } from '@google-cloud/firestore';
 import * as admin from 'firebase-admin';
+
+type FirebaseTimestamp = Timestamp | Date;
 
 interface WithUid {
   uid: string;
+}
+
+interface CreatedAt {
+  createdAt: FirebaseTimestamp;
 }
 
 /**
@@ -26,6 +32,33 @@ function getDataArray<T extends Object>(refs: DocumentSnapshot[]): (T & WithUid)
   return refs.map(ref => getData(ref));
 }
 
+/** Converts FirebaseTimestamp to Date. */
+function getDate(item: FirebaseTimestamp): Date {
+  if (!(item instanceof Date)) {
+    return item.toDate();
+  }
+  return item;
+}
+
+/** Converts FirebaseTimestamp to Timestamp */
+function getTimestamp(item: FirebaseTimestamp): Timestamp {
+  if (!(item instanceof Date)) {
+    return item;
+  }
+  return admin.firestore.Timestamp.fromDate(item);
+}
+
+/** Converts firestore.Timestamp to navite JavaScript Date. */
+function createdAtToDate<T extends CreatedAt> (item: T): T {
+  item.createdAt = getDate(item.createdAt);
+  return item;
+}
+
+/** Converts firestore.Timestamp to navite JavaScript Date. */
+function createdAtsToDate<T extends CreatedAt> (items: T[]): T[] {
+  return items.map(t => createdAtToDate(t));
+}
+
 function asUid(refOrUid: DocumentSnapshot | string): WithUid {
   if (typeof refOrUid === 'string') {
     return { uid: refOrUid };
@@ -33,10 +66,16 @@ function asUid(refOrUid: DocumentSnapshot | string): WithUid {
   return { uid: refOrUid.id };
 }
 
-export { 
+export {
   getAll,
   getData,
   getDataArray,
   asUid,
   WithUid,
+  CreatedAt,
+  createdAtToDate,
+  createdAtsToDate,
+  FirebaseTimestamp,
+  getDate,
+  getTimestamp,
 }

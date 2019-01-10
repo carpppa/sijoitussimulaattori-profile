@@ -205,9 +205,7 @@ paths:
             type: "array"
             items:
               allOf: 
-              - $ref: "#/definitions/Uid"
-              - $ref: "#/definitions/TransactionRequest"
-              - $ref: "#/definitions/MoneyTransactionBalanceChange"
+              - $ref: "#/definitions/TransactionExecuted"
         400:
           description: "Parameters invalid"
         401:
@@ -236,7 +234,7 @@ paths:
           schema:
             allOf:
               - $ref: "#/definitions/Uid"
-              - $ref: "#/definitions/TransactionRequest"
+              - $ref: "#/definitions/TransactionExecuted"
         400:
           description: "Parameters invalid"
         401:
@@ -398,7 +396,31 @@ definitions:
         description: "Price of single stock"
         minimum: 0
         exclusiveMinimum: true
-      expires:
+      expiresAt:
         type: "string"
         description: "Expiration time of the request"
         format: "yyyy-MM-ddTHH:mm:ss"
+        
+  TransactionExecuted:
+    type: "object"
+    allOf: 
+      - $ref: "#/definitions/Uid"
+      - $ref: "#/definitions/TransactionRequest"
+      - properties:
+          state: 
+            type: "string"
+            description: "State of transaction"
+            enum: 
+            - "MARKET"
+            - "CANCELLED"
+            - "FULFILLED"
+          fulfilledAt:
+            description: "Timestamp of fulfillment, if fulfilled"
+            type: "string"
+            format: "yyyy-MM-ddTHH:mm:ss"
+          cancelledAt:
+            description: "Timestamp of cancellation, if cancelled"
+            type: "string"
+            format: "yyyy-MM-ddTHH:mm:ss"
+          
+    

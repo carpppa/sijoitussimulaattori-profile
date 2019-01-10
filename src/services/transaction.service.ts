@@ -1,8 +1,9 @@
+import { Timestamp } from '@google-cloud/firestore';
 import * as admin from 'firebase-admin';
 
-import { DB, TRANSACTION, PORTFOLIO, STOCK } from '../firebase-constants';
-import { TransactionWithUid, Transaction, TransactionExecuted, TransactionStatus, TransactionType } from '../models';
-import { getData, getDataArray, getAll } from '../utils';
+import { DB, PORTFOLIO, STOCK, TRANSACTION } from '../firebase-constants';
+import { Transaction, TransactionExecuted, TransactionStatus, TransactionType, TransactionWithUid } from '../models';
+import { getAll, getData, getDataArray } from '../utils';
 
 async function getTransactionsForPortfolio(portfolioId: string): Promise<TransactionWithUid[]> {
   const query = await admin.firestore()
@@ -14,7 +15,7 @@ async function getTransactionsForPortfolio(portfolioId: string): Promise<Transac
     return [];
   }
 
-  const transfers = await getAll(query.docs.map(d => d.ref)); 
+  const transfers = await getAll(query.docs.map(d => d.ref));
 
   return getDataArray<TransactionWithUid>(transfers);
 }
@@ -46,7 +47,8 @@ async function createBuyTransactionForPortfolio(portfolioId: string, transaction
     const transactionExecuted: TransactionExecuted = {
       ...transaction,
       portfolioId,
-      status: TransactionStatus.MARKET
+      status: TransactionStatus.MARKET,
+      createdAt: admin.firestore.Timestamp.now(),
     };
 
     await tx.set(transactionDoc.ref, transactionExecuted);
@@ -65,7 +67,7 @@ async function createSellTransactionForPortfolio(portfolioId: string, transactio
     const symbol = transaction.symbol;
     const portfolioDoc = await tx.get(admin.firestore().collection(DB.PORTFOLIOS).doc(portfolioId));
     const stockDoc = await tx.get(portfolioDoc.ref.collection(PORTFOLIO.STOCKS).doc(symbol));
-    
+
     if (!stockDoc.exists) {
       throw new Error("Cannot sell a stock that is not in portfolio.");
     }
@@ -75,17 +77,18 @@ async function createSellTransactionForPortfolio(portfolioId: string, transactio
     if (stockAmount < transaction.amount) {
       throw new Error("Not enough stocks to sell.");
     }
-    
+
     const transactionDoc = await tx.get(admin.firestore().collection(DB.TRANSACTIONS).doc());
 
     const transactionExecuted: TransactionExecuted = {
       ...transaction,
       portfolioId,
-      status: TransactionStatus.MARKET
+      status: TransactionStatus.MARKET,
+      createdAt: admin.firestore.Timestamp.now(),
     };
 
     await tx.set(transactionDoc.ref, transactionExecuted);
-    
+
     return transactionDoc.id;
   });
 
@@ -94,7 +97,7 @@ async function createSellTransactionForPortfolio(portfolioId: string, transactio
   return getData<TransactionWithUid>(createdTransaction);
 }
 
-async function cancelTransaction(transactionId: string): Promise<TransactionWithUid> { 
+async function cancelTransaction(transactionId: string): Promise<TransactionWithUid> {
   const transactionDoc = await admin.firestore().collection(DB.TRANSACTIONS).doc(transactionId).get();
   const type: TransactionType = transactionDoc.get(TRANSACTION.TYPE);
   const status: TransactionStatus = transactionDoc.get(TRANSACTION.STATUS);
@@ -127,8 +130,19 @@ async function cancelBuyTransaction(transactionId: string): Promise<TransactionW
     // Refund price and set transaction to cancelled
     const transactionPrice = amount * price;
     const newBalance = balance + transactionPrice;
-    await tx.set(portfolioDoc.ref, { balance: newBalance}, {mergeFields: [PORTFOLIO.BALANCE] });
-    await tx.set(transactionDoc.ref, { status: TransactionStatus.CANCELLED }, {mergeFields: [TRANSACTION.STATUS]});
+
+    await tx.set(
+      portfolioDoc.ref,
+      { balance: newBalance},
+      { mergeFields: [PORTFOLIO.BALANCE] }
+    );
+
+    await tx.set(
+      transactionDoc.ref,
+      { status: TransactionStatus.CANCELLED, cancelledAt: Timestamp.now() },
+      { mergeFields: [ TRANSACTION.STATUS, TRANSACTION.CANCELLED_AT ] }
+    );
+
     return transactionDoc.id;
   });
 
@@ -145,11 +159,11 @@ async function cancelSellTransaction(transactionId: string): Promise<Transaction
 
     const symbol: string = await transactionDoc.get(TRANSACTION.SYMBOL);
     const stockDoc = await tx.get(portfolioDoc.ref.collection(PORTFOLIO.STOCKS).doc(symbol));
-    
+
     const sellAmount = transactionDoc.get(TRANSACTION.AMOUNT);
     const oldAmount = stockDoc.get(STOCK.AMOUNT);
     const newAmount = oldAmount + sellAmount;
-    
+
     // Refund stock amount and set cancelled
     await tx.set(stockDoc.ref, { amount: newAmount}, { mergeFields: [TRANSACTION.AMOUNT]});
     await tx.set(transactionDoc.ref, { status: TransactionStatus.CANCELLED }, {mergeFields: [TRANSACTION.STATUS]});
@@ -198,7 +212,11 @@ async function fulfillTransaction(transactionId: string): Promise<TransactionWit
       throw new Error("Transaction type unknown");
     }
 
-    await tx.set(transactionDoc.ref, { status: TransactionStatus.FULFILLED }, {mergeFields: [TRANSACTION.STATUS]});
+    await tx.set(
+      transactionDoc.ref,
+      { status: TransactionStatus.FULFILLED, fulfilledAt: Timestamp.now() },
+      { mergeFields: [ TRANSACTION.STATUS, TRANSACTION.FULFILLED_AT ] },
+    );
 
     return transactionDoc.id;
   });

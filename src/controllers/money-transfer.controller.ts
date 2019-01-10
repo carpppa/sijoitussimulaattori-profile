@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
+
 import { MoneyTransfer } from '../models/';
-import { logger } from '../utils';
 import { createMoneytransferForPortfolio, getMoneytransfersForPortfolio } from '../services';
+import { logger, preSerializeMoneytransfer } from '../utils';
 
 const getMoneyTransfers = async (req: Request, res: Response) => {
   try {
     const portfolioId: string = req.params.portfolioId;
 
-    const moneyTransfers = await getMoneytransfersForPortfolio(portfolioId);
+    const moneyTransfers = (await getMoneytransfersForPortfolio(portfolioId)).map(preSerializeMoneytransfer);
     res.send(moneyTransfers);
 
   } catch (error) {
@@ -22,7 +23,7 @@ const postMoneyTransfer = async (req: Request, res: Response) => {
     const portfolioId: string = req.params.portfolioId;
     const moneyTransfer: MoneyTransfer = req.body;
 
-    const createdMoneyTransfer = await createMoneytransferForPortfolio(portfolioId, moneyTransfer);
+    const createdMoneyTransfer = preSerializeMoneytransfer(await createMoneytransferForPortfolio(portfolioId, moneyTransfer));
     res.send(createdMoneyTransfer);
 
   } catch (error) {
@@ -32,7 +33,7 @@ const postMoneyTransfer = async (req: Request, res: Response) => {
   }
 }
 
-export { 
+export {
   postMoneyTransfer,
   getMoneyTransfers,
  }

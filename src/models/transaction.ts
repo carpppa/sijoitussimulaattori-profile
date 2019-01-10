@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 
-import { WithUid } from './../utils/firebase-utils';
+import { CreatedAt, FirebaseTimestamp, WithUid } from './../utils/firebase-utils';
 
 type Symbol = string;
 
@@ -23,11 +23,14 @@ interface Transaction {
   type: TransactionType;
   amount: number;
   price: number;
+  expiresAt: FirebaseTimestamp;
 }
 
-interface TransactionExecuted extends Transaction {
+interface TransactionExecuted extends Transaction, CreatedAt {
   portfolioId: string;
   status: TransactionStatus;
+  fulfilledAt?: FirebaseTimestamp;
+  cancelledAt?: FirebaseTimestamp;
 }
 
 type TransactionWithUid = TransactionExecuted & WithUid;
@@ -45,6 +48,7 @@ const transactionSchema = Joi.object({
     TransactionType.BUY,
     TransactionType.SELL,
   ).required(),
+  expiresAt: Joi.date().required(),
 });
 
 const transactionWithUidSchema = Joi.object({

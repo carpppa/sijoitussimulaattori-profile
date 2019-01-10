@@ -1,8 +1,8 @@
 import * as admin from 'firebase-admin';
 
 import { DB, PORTFOLIO, TRANSFER } from '../firebase-constants';
-import { MoneyTransferWithUid, MoneyTransfer, MoneyTransferExecuted } from '../models';
-import { getData, getDataArray, getAll } from '../utils';
+import { MoneyTransfer, MoneyTransferExecuted, MoneyTransferWithUid } from '../models';
+import { getAll, getData, getDataArray } from '../utils';
 
 async function getMoneytransfersForPortfolio(portfolioId: string): Promise<MoneyTransferWithUid[]> {
   const query = await admin.firestore()
@@ -14,7 +14,7 @@ async function getMoneytransfersForPortfolio(portfolioId: string): Promise<Money
     return [];
   }
 
-  const transfers = await getAll(query.docs.map(d => d.ref)); 
+  const transfers = await getAll(query.docs.map(d => d.ref));
 
   return getDataArray<MoneyTransferWithUid>(transfers);
 
@@ -37,8 +37,9 @@ async function createMoneytransferForPortfolio(portfolioId: string, transfer: Mo
       portfolioId,
       oldBalance,
       newBalance,
+      createdAt: admin.firestore.Timestamp.now(),
     }
-    
+
     tx.set(moneyTransfer.ref, calculatedTransfer);
     tx.set(portfolioDoc.ref, {balance: newBalance}, {mergeFields: [PORTFOLIO.BALANCE]})
 
