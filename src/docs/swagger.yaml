@@ -322,8 +322,10 @@ definitions:
       - amount
       - avgPrice
     allOf: 
-      - $ref: "#/definitions/Uid"
       - properties:
+          uid:
+            type: "string"
+            description: "UID of the stock. At the same time it is the symbol of the stock"
           amount: 
             type: "number"
             description: "Amount of owned stocks"
@@ -339,6 +341,7 @@ definitions:
           stocks:
             type: "array"
             items:
+              allOf:
               - $ref: "#/definitions/Stock"
         
   MoneyTransactionRequest:

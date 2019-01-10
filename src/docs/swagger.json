@@ -499,10 +499,11 @@
       ],
       "allOf": [
         {
-          "$ref": "#/definitions/Uid"
-        },
-        {
           "properties": {
+            "uid": {
+              "type": "string",
+              "description": "UID of the stock. At the same time it is the symbol of the stock"
+            },
             "amount": {
               "type": "number",
               "description": "Amount of owned stocks"
@@ -525,11 +526,13 @@
           "properties": {
             "stocks": {
               "type": "array",
-              "items": [
-                {
-                  "$ref": "#/definitions/Stock"
-                }
-              ]
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/Stock"
+                  }
+                ]
+              }
             }
           }
         }
