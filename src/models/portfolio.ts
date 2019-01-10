@@ -5,6 +5,7 @@ import { StockInPortfolioWithUid } from './stock';
 
 interface Portfolio {
   name: string;
+  balance?: number;
 }
 
 interface PortfolioWithOwner extends Portfolio {
@@ -17,7 +18,7 @@ type PortfolioWithUid = PortfolioWithOwner & WithUid;
 
 const portfolioSchema = Joi.object({
   name: Joi.string().required(),
-  uid: Joi.string(),
+  balance: Joi.number(),
 });
 
 const portfolioIdSchema = Joi.object({

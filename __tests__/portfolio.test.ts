@@ -119,13 +119,19 @@ describe('/profile/portfolio', () => {
     done();
   }, TEST_TIMEOUT);
 
-  it('POST should return new portfolio', async (done) => {
+  it('POST should return new portfolio with default balance', async (done) => {
     const promises: Promise<void>[] = [];
 
     for(let i = 0; i < confs.portfolios.create; i++) {
       const createPortfolio = async () => {
         const portfolio: Portfolio = {
           name: 'test-portfolio-' + randomInt().toString()
+        }
+
+        const useDefaultBalance = Math.random() > 0.5;
+
+        if (!useDefaultBalance) {
+          portfolio.balance = 200;
         }
 
         const result = await request(app)
@@ -139,7 +145,12 @@ describe('/profile/portfolio', () => {
         confs.portfolios.created.push(created.uid);
         expect(created.name).toEqual(portfolio.name);
         allPortfolios[created.uid] = created;
-        expect(created.balance).toEqual(0);
+
+        if(!useDefaultBalance) {
+          expect(created.balance).toEqual(portfolio.balance);
+        } else {
+          expect(created.balance).toEqual(0);
+        }
       }
       promises.push(createPortfolio());
     }
@@ -159,7 +170,7 @@ describe('/profile/portfolio', () => {
     expect(result.status).toEqual(200);
     expect(result.body).toBeDefined();
     const pf = result.body as PortfolioWithUid;
-    expect(pf.balance).toEqual(0);
+    expect(pf.balance === 0 || pf.balance === 200).toBeTruthy();
     expect(pf.name).toBeDefined();
     expect(pf.ownerId).toEqual(testUser);
     expect(pf.uid).toBeDefined();
@@ -179,7 +190,7 @@ describe('/profile/portfolio', () => {
     expect(portfolios).toHaveLength(confs.portfolios.create);
     expect(portfolios.map(pf => pf.uid)).toEqual(expect.arrayContaining(Object.keys(allPortfolios)));
     portfolios.forEach(pf => {
-      expect(pf.balance).toEqual(0);
+      expect(pf.balance === 0 || pf.balance === 200).toBeTruthy();
       expect(pf.name).toBeDefined();
       expect(pf.ownerId).toEqual(testUser);
       expect(pf.uid).toBeDefined();

@@ -38,9 +38,9 @@ async function getPortfolioById(portfolioId: string): Promise<PortfolioWithUid> 
 async function createPortfolioForUser(userId: string, portfolio: Portfolio): Promise<PortfolioWithUid> {
   const createdId = await admin.firestore().runTransaction(async (tx) => {
     const portfolioWithOwner: PortfolioWithOwner = {
+      balance: 0,
       ...portfolio,
       ownerId: userId,
-      balance: 0,
     }
     const portfolioDoc = admin.firestore().collection(DB.PORTFOLIOS).doc();
     tx.set(portfolioDoc, portfolioWithOwner);
