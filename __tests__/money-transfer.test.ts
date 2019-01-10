@@ -7,9 +7,17 @@ import app from '../src/app';
 import config from '../src/config';
 import * as firebase from '../src/firebase';
 import { DB } from '../src/firebase-constants';
-import { PortfolioWithUid, MoneyTransferWithUid, MoneyTransfer } from '../src/models';
-import { getIdTokenForTest, getOrCreateUser, createPortfolioForUser, shuffle, removeUser } from '../src/utils/firebase-test-utils';
+import { MoneyTransfer, MoneyTransferWithUid, PortfolioWithUid } from '../src/models';
+import {
+  createPortfolioForUser,
+  getIdTokenForTest,
+  getOrCreateUser,
+  removeUser,
+  shuffle,
+} from '../src/utils/firebase-test-utils';
 import { randomInt } from '../src/utils/general';
+
+const TEST_TIMEOUT = 10000;
 
 describe('/profile/portfolio/balance', () => {
   let validToken: string;
@@ -35,7 +43,7 @@ describe('/profile/portfolio/balance', () => {
   };
 
   beforeAll(async (done) => {
-    
+
     confs = {
       portfolios: {
         created: [],
@@ -109,7 +117,7 @@ describe('/profile/portfolio/balance', () => {
 
     expect(result.status).toEqual(403);
     done();
-  }, 10000);
+  }, TEST_TIMEOUT);
 
   it('GET should return 403 with invalid token', async (done) => {
 
@@ -121,7 +129,7 @@ describe('/profile/portfolio/balance', () => {
 
     expect(result.status).toEqual(403);
     done();
-  }, 10000);
+  }, TEST_TIMEOUT);
 
   it('GET should return 404 without ownership to portfolio', async (done) => {
     const result = await request(app)
@@ -130,7 +138,7 @@ describe('/profile/portfolio/balance', () => {
 
     expect(result.status).toEqual(404);
     done();
-  }, 10000);
+  }, TEST_TIMEOUT);
 
   it('GET should return empty list', async (done) => {
     const result = await request(app)
@@ -142,7 +150,7 @@ describe('/profile/portfolio/balance', () => {
     const portfolios = result.body as MoneyTransferWithUid[];
     expect(portfolios).toHaveLength(0);
     done();
-  }, 10000);
+  }, TEST_TIMEOUT);
 
   it('POST should create money transfers', async (done) => {
     const requests: Promise<void>[] = [];
@@ -184,7 +192,7 @@ describe('/profile/portfolio/balance', () => {
     balance += minus;
     await createRequest(minus);
     done();
-  }, 10000);
+  }, TEST_TIMEOUT);
 
   it('GET should list money transfers', async (done) => {
     const result = await request(app)
@@ -197,7 +205,7 @@ describe('/profile/portfolio/balance', () => {
     expect(transfers).toHaveLength(confs.transfers.create);
     expect(result.status).toEqual(200);
     done();
-  }, 10000);
+  }, TEST_TIMEOUT);
 
   it('POST new transfer should reject if balance would end up negative', async (done) => {
     const transfer: MoneyTransfer = {
@@ -211,7 +219,7 @@ describe('/profile/portfolio/balance', () => {
 
     expect(result.status).toEqual(400)
     done();
-  }, 10000);
+  }, TEST_TIMEOUT);
 
   it('POST should have altered balance of the portfolio', async (done) => {
     const result = await request(app)
@@ -226,6 +234,6 @@ describe('/profile/portfolio/balance', () => {
     expect(pf.ownerId).toEqual(testUser);
     expect(pf.uid).toBeDefined();
     done();
-  }, 10000);
+  }, TEST_TIMEOUT);
 
 });

@@ -13,6 +13,8 @@ import { fulfillTransaction } from '../src/services';
 import { createPortfolioForUser, getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/firebase-test-utils';
 import { randomInt } from '../src/utils/general';
 
+const TEST_TIMEOUT = 10000;
+
 describe('/profile/portfolio/:portfolioId/transaction', () => {
   let validToken: string;
   let validToken2: string;
@@ -40,7 +42,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
   };
 
   beforeAll(async (done) => {
-    
+
     confs = {
       portfolios: {
         created: [],
@@ -125,7 +127,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return 403 with invalid token', async (done) => {
 
@@ -137,7 +139,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return 404 without ownership to portfolio', async (done) => {
     const result = await request(app)
@@ -146,7 +148,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     expect(result.status).toEqual(404);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return empty list', async (done) => {
     const result = await request(app)
@@ -158,7 +160,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     const transactions = result.body as TransactionWithUid[];
     expect(transactions).toHaveLength(0);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('POST should return 400 when balance is too low', async (done) => {
     const transaction: Transaction = {
@@ -175,7 +177,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     expect(result.status).toEqual(400);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('POST should return 400 when transaction is misformed', async (done) => {
     const transaction1: Transaction = {
@@ -184,7 +186,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
       price: -100,
       symbol: 'FAKE-STOCK'
     }
-    
+
     const transaction2: Transaction = {
       type: TransactionType.BUY,
       amount: -10,
@@ -209,7 +211,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
       request(app)
         .post(`/profile/portfolio/${portfolioId}/transaction`)
         .set('authorization', `Bearer ${validToken}`)
-        .send(transaction1), 
+        .send(transaction1),
       request(app)
         .post(`/profile/portfolio/${portfolioId}/transaction`)
         .set('authorization', `Bearer ${validToken}`)
@@ -232,7 +234,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(results[3].status).toEqual(400);
 
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('POST should return 400 stock under sell is not in portfolio', async (done) => {
     const transaction1: Transaction = {
@@ -250,7 +252,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(result.status).toEqual(400);
 
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('POST should create BUY transaction and alter portfolio balance', async (done) => {
     const transaction1: Transaction = {
@@ -269,7 +271,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     const inMarket = result.body as TransactionWithUid;
     confs.transactions.created.push(inMarket.uid);
-    
+
     expect(inMarket.amount).toEqual(transaction1.amount);
     expect(inMarket.price).toEqual(transaction1.price);
     expect(inMarket.symbol).toEqual(transaction1.symbol);
@@ -290,7 +292,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     balance -= transaction1.amount * transaction1.price;
 
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return list of transactions', async (done) => {
     const result = await request(app)
@@ -302,7 +304,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     const transactions = result.body as TransactionWithUid[];
     expect(transactions).toHaveLength(1);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('Fulfilling BUY-transaction should add stocks to portfolio and alter transaction state', async (done) => {
     const result1 = await request(app)
@@ -327,11 +329,11 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(Array.isArray(result2.body)).toBeTruthy();
     const transactions2 = result2.body as TransactionWithUid[];
     expect(transactions2).toHaveLength(1);
-    
+
     const transaction2 = transactions2[0];
     expect(transaction2.status).toEqual(TransactionStatus.FULFILLED);
     done();
-  })
+  }, TEST_TIMEOUT);
 
    it('Selling stocks in portfolio from portfolio should be allowed and alter stock amount.', async (done) => {
     const result1 = await request(app)
@@ -371,7 +373,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(inMarket.uid).toBeDefined();
     expect(inMarket.status).toEqual(TransactionStatus.MARKET);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET with id should return single portfolio with stocks', async (done) => {
     const result = await request(app)
@@ -391,7 +393,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(stocks[0].amount).toBe(20);
     expect(stocks[0].avgPrice).toBe(50);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('Fulfilling SELL transaction should alter balance of portfolio', async (done) => {
     const result1 = await request(app)
@@ -419,7 +421,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(portfolio.balance).toEqual(balance);
 
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET with id should return single portfolio with stocks updated after sell', async (done) => {
     const result = await request(app)
@@ -439,8 +441,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(stocks[0].amount).toBe(15);
     expect(stocks[0].avgPrice).toBe(50);
     done();
-  });
-
+  }, TEST_TIMEOUT);
 
   it('DELETE of fulfilled transaction should return 400 ', async (done) => {
     const result1 = await request(app)
@@ -461,5 +462,5 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     expect(result2.status).toEqual(400);
     done();
-  });
+  }, TEST_TIMEOUT);
 });

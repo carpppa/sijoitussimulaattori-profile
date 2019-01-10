@@ -12,6 +12,8 @@ import { getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/fir
 import { randomInt } from '../src/utils/general';
 import { WithUid } from './../src/utils/firebase-utils';
 
+const TEST_TIMEOUT = 10000;
+
 describe('/profile/portfolio', () => {
   let validToken: string;
   let validToken2: string;
@@ -91,7 +93,7 @@ describe('/profile/portfolio', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return 403 with invalid token', async (done) => {
 
@@ -103,7 +105,7 @@ describe('/profile/portfolio', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return empty list', async (done) => {
     const result = await request(app)
@@ -115,7 +117,7 @@ describe('/profile/portfolio', () => {
     expect(portfolios).toHaveLength(0);
     expect(result.status).toEqual(200);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('POST should return new portfolio', async (done) => {
     const promises: Promise<void>[] = [];
@@ -145,7 +147,7 @@ describe('/profile/portfolio', () => {
     await Promise.all(promises);
 
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET with id should return single portfolio', async (done) => {
     const createdPortfolio = confs.portfolios.created[0];
@@ -163,7 +165,7 @@ describe('/profile/portfolio', () => {
     expect(pf.uid).toBeDefined();
     expect(pf.stocks).toBeDefined();
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return created portfolios', async (done) => {
     const result = await request(app)
@@ -183,7 +185,7 @@ describe('/profile/portfolio', () => {
       expect(pf.uid).toBeDefined();
     });
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('DELETE should disallow deleting other users portfolios', async (done) => {
 
@@ -203,7 +205,7 @@ describe('/profile/portfolio', () => {
 
     await Promise.all(promises);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('DELETE should return deleted portfolio uid', async (done) => {
 
@@ -229,7 +231,7 @@ describe('/profile/portfolio', () => {
 
     await Promise.all(promises);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should not return deleted portfolios', async (done) => {
     const result = await request(app)
@@ -247,5 +249,5 @@ describe('/profile/portfolio', () => {
     left.forEach(key => expect(portfolios.find(pf => pf.uid === key)).toBeDefined());
 
     done();
-  });
+  }, TEST_TIMEOUT);
 });
