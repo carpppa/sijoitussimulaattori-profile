@@ -297,8 +297,8 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
     expect(portfolioResult.status).toEqual(200);
     const portfolio = portfolioResult.body as PortfolioWithUid;
     expect(portfolio.balance).toEqual(originalBalance1 - transaction1.amount * transaction1.price);
-
     balance -= transaction1.amount * transaction1.price;
+    expect(portfolio.balance).toEqual(balance);
 
     done();
   }, TEST_TIMEOUT);
