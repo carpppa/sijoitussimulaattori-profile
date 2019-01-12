@@ -128,7 +128,7 @@ describe('/profile/portfolio', () => {
           name: 'test-portfolio-' + randomInt().toString()
         }
 
-        const useDefaultBalance = Math.random() > 0.5;
+        const useDefaultBalance = i > 1;
 
         if (!useDefaultBalance) {
           portfolio.balance = 200;

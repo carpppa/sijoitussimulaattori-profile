@@ -36,7 +36,6 @@ interface TransactionExecuted extends Transaction, CreatedAt {
 type TransactionWithUid = TransactionExecuted & WithUid;
 
 const transactionIdSchema = Joi.object({
-  portfolioId: Joi.string().required(),
   transactionId: Joi.string().required(),
 })
 

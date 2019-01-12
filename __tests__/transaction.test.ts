@@ -199,7 +199,7 @@ describe('/profile/portfolio/:portfolioId/transaction', () => {
 
     const transaction3: any = {
       type: 'NOT_TRANSACTION_TYPE',
-      amount: -10,
+      amount: 10,
       price: 100,
       symbol: 'FAKE-STOCK',
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),

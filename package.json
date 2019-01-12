@@ -51,6 +51,7 @@
     "express-winston": "^3.0.1",
     "firebase-admin": "^6.3.0",
     "joi": "^13.7.0",
+    "lodash": "^4.17.11",
     "swagger-ui-express": "^4.0.1",
     "winston": "^3.1.0"
   },
@@ -59,6 +60,7 @@
     "@types/express-winston": "^3.0.0",
     "@types/jest": "^23.3.5",
     "@types/joi": "^13.6.1",
+    "@types/lodash": "^4.14.119",
     "@types/node": "^10.11.7",
     "@types/supertest": "^2.0.6",
     "@types/swagger-ui-express": "^3.0.0",

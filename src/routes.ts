@@ -1,14 +1,22 @@
-import { Request, Response } from 'express';
 import * as express from 'express';
+import { Request, Response } from 'express';
 import * as validation from 'express-joi-validation';
 import * as swaggerUi from 'swagger-ui-express';
 
-import { deletePortfolio, getPortfolios, postPortfolio, getPortfolio, postTransaction, getTransactions, deleteTransaction } from './controllers';
-import * as swaggerDocument from './docs/swagger.json';
-import { helloSchema, portfolioSchema, portfolioIdSchema, transactionSchema, transactionIdSchema } from './models';
-import { authenticateRequest } from './utils';
-import { moneyTransferSchema } from './models/money-transfer';
+import {
+  deletePortfolio,
+  deleteTransaction,
+  getPortfolio,
+  getPortfolios,
+  getTransactions,
+  postPortfolio,
+  postTransaction,
+} from './controllers';
 import { getMoneyTransfers, postMoneyTransfer } from './controllers/money-transfer.controller';
+import * as swaggerDocument from './docs/swagger.json';
+import { helloSchema, portfolioIdSchema, portfolioSchema, transactionIdSchema, transactionSchema } from './models';
+import { moneyTransferSchema } from './models/money-transfer';
+import { authenticateRequest } from './utils';
 import { ensurePortfolioOwnership } from './utils/firebase-ownership-middleware';
 
 export class Routes {
@@ -104,7 +112,7 @@ export class Routes {
           ensurePortfolioOwnership(),
           getTransactions
         );
-        
+
       app
         .route('/profile/portfolio/:portfolioId/transaction')
         .post(
@@ -119,6 +127,7 @@ export class Routes {
         .route('/profile/portfolio/:portfolioId/transaction/:transactionId')
         .delete(
           authenticateRequest(),
+          this.validator.params(portfolioIdSchema),
           this.validator.params(transactionIdSchema),
           ensurePortfolioOwnership(),
           deleteTransaction

@@ -1,11 +1,11 @@
+import * as _ from 'lodash';
+
 import { MoneyTransferWithUid, TransactionWithUid } from '../models';
 import { getDate } from './firebase-utils';
 
 /** PreSerializer transforms possible FirebaseTimestamp fields to Date fields. */
 function preSerializeTransaction(item: TransactionWithUid): TransactionWithUid {
-  const copied: TransactionWithUid = {
-    ...item
-  };
+  const copied = _.cloneDeep(item);
 
   if (copied.cancelledAt) {
     copied.cancelledAt = getDate(copied.cancelledAt);
@@ -21,12 +21,9 @@ function preSerializeTransaction(item: TransactionWithUid): TransactionWithUid {
   return copied;
 }
 
-
 /** PreSerializer transforms possible FirebaseTimestamp fields to Date fields. */
 function preSerializeMoneytransfer(item: MoneyTransferWithUid): MoneyTransferWithUid {
-  const copied: MoneyTransferWithUid = {
-    ...item
-  };
+  const copied = _.cloneDeep(item);
 
   copied.createdAt = getDate(copied.createdAt);
 
