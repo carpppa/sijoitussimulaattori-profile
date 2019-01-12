@@ -5,7 +5,7 @@ import { getDate, isDefined, logger } from '../utils';
 
 type TransactionHandlingState = {
   transaction: TransactionWithUid,
-  fullfilment?: Date,
+  fulfillment?: Date,
   expired?: Boolean,
 };
 
@@ -17,8 +17,8 @@ type TransactionHandlingState = {
  * @param transactions
  * @param prices
  */
-function getTransactionsToFullfilmentDates(transactions: TransactionWithUid[], prices: SymbolsPriceData): TransactionHandlingState[] {
-  return transactions.map(transaction => {
+function getTransactionsToFullfilmentDates(transactions: TransactionWithUid[], prices: SymbolsPriceData, moment: Date): TransactionHandlingState[] {
+  return transactions.map<TransactionHandlingState>((transaction): TransactionHandlingState => {
     try {
       const price = prices[transaction.symbol];
 
@@ -30,7 +30,7 @@ function getTransactionsToFullfilmentDates(transactions: TransactionWithUid[], p
       const fulfillment = whenTransactionFulfills(transaction, price);
 
       if (!fulfillment) {
-        return { transaction, expired: isExpired(transaction) }
+        return { transaction, expired: isExpired(transaction, moment) }
       }
 
       logger.debug(`Fullfilling transaction ${transaction.uid}`);
@@ -68,9 +68,14 @@ function whenBuyFulfills(transaction: TransactionWithUid, price: PriceData): Dat
   const history = price.history.filter(p => isBetween(p.date, createdAt, expiresAt));
   const intra = price.intraday.filter(p => isBetween(p.date, createdAt, expiresAt));
   const prices = [...history, ...intra].sort((a, b) => dateComparator(a.date, b.date));
-  // Find first moment when stock price exceeds transaction price.
-  const fulfillmentMoment = prices.find(d => d.low <= transaction.price);
-  return fulfillmentMoment ? fulfillmentMoment.date : undefined;
+  // Find moments when stock price exceeds transaction price and its not expired.
+  const fulfillmentMoments = prices.filter(d => d.low <= transaction.price);
+  if (fulfillmentMoments.length === 0) {
+    return undefined;
+  }
+  // Find earliest moment
+  const earliestFulfillment = new Date(Math.min(...fulfillmentMoments.map(t => t.date.getTime())));
+  return earliestFulfillment;
 }
 
 /** Returns date when stock price  */
@@ -82,21 +87,26 @@ function whenSellFulfills(transaction: TransactionWithUid, price: PriceData): Da
   const history = price.history.filter(p => isBetween(p.date, createdAt, expiresAt));
   const intra = price.intraday.filter(p => isBetween(p.date, createdAt, expiresAt));
   const prices = [...history, ...intra].sort((a, b) => dateComparator(a.date, b.date));
-  // Find first moment when stock price exceeds transaction price and its not expired.
-  const fulfillmentMoment = prices.find(d => d.high >= transaction.price);
-  return fulfillmentMoment ? fulfillmentMoment.date : undefined;
+  // Find moments when stock price exceeds transaction price and its not expired.
+  const fulfillmentMoments = prices.filter(d => d.high >= transaction.price);
+  if (fulfillmentMoments.length === 0) {
+    return undefined;
+  }
+  // Find earliest moment
+  const earliestFulfillment = new Date(Math.min(...fulfillmentMoments.map(t => t.date.getTime())));
+  return earliestFulfillment;
 }
 
 function findOldestTransactionCreatedAt(transactions: TransactionWithUid[]): Date {
   return new Date(Math.min(...transactions.map(tx => getDate(tx.createdAt).getTime())));
 }
 
-function isExpired(transaction: TransactionWithUid): boolean {
-  return getDate(transaction.expiresAt).getTime() >= Date.now();
+function isExpired(transaction: TransactionWithUid, nowMoment: Date): boolean {
+  return getDate(transaction.expiresAt).getTime() <= nowMoment.getTime();
 }
 
-function isNotExpired(transaction: TransactionWithUid): boolean {
-  return !isExpired(transaction);
+function isNotExpired(transaction: TransactionWithUid, nowMoment: Date): boolean {
+  return !isExpired(transaction, nowMoment);
 }
 
 function isBetween(value: Date, after: Date, before: Date): boolean {
@@ -104,7 +114,7 @@ function isBetween(value: Date, after: Date, before: Date): boolean {
 }
 
 function dateComparator(a: Date, b: Date) {
-  return b.getTime() - a.getTime();
+  return a.getTime() - b.getTime();
 }
 
 export {

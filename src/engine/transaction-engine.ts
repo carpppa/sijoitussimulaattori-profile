@@ -1,6 +1,7 @@
 import { IPriceData, IProfileData, TransactionWithUid } from '../models';
 import { preSerializeTransaction } from '../utils';
 import { PromiseQueue } from '../utils/promise-queue';
+import { pricesService, profileDataService } from './../services';
 import { filterSymbols, findOldestTransactionCreatedAt, getTransactionsToFullfilmentDates } from './engine-utils';
 
 /** Responsible for fulfilling transactions */
@@ -42,14 +43,16 @@ class TransactionEngine {
     const symbols = filterSymbols(transactions);
     const prices = await this.priceData.getPrices(symbols, from, to);
     // Get transaction states (which should be fullfilled, which expired, which stays pending)
-    const transactionStates = getTransactionsToFullfilmentDates(transactions, prices);
+    const transactionStates = getTransactionsToFullfilmentDates(transactions, prices, new Date(Date.now()));
     // Get fulfillment and expire orders
-    const fullfilled = transactionStates.filter(t => t.fullfilment).map(async (t) => this.profileData.fulfillTransaction(t.transaction.uid, t.fullfilment));
+    const fullfilled = transactionStates.filter(t => t.fulfillment).map(async (t) => this.profileData.fulfillTransaction(t.transaction.uid, t.fulfillment));
     const expired = transactionStates.filter(t => t.expired).map(async (t) => this.profileData.cancelTransaction(t.transaction.uid));
     // Execute orders
     await Promise.all([...fullfilled, ...expired]);
   }
 }
+
+export const transactionEngine = new TransactionEngine(profileDataService, pricesService);
 
 export {
   TransactionEngine,

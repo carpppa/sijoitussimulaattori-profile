@@ -1,19 +1,21 @@
-import { IStockData, SymbolsPriceData } from '../models';
+import { IPriceData, IStockData, SymbolsPriceData } from '../models';
 import { isDefined } from '../utils';
 import { stockDataService } from './stock-data.service';
 
-class PricesService {
+class PricesService implements IPriceData {
 
   constructor(private stockData: IStockData) { }
 
   /** Gets history and intraday data for given symbols */
-  async getPriceData(symbols: string[], from?: Date, to?: Date): Promise<SymbolsPriceData> {
+  async getPrices(symbols: string[], from?: Date, to?: Date): Promise<SymbolsPriceData> {
     // Get prices
     const pricesRaw = await Promise.all(
       symbols.map<Promise<SymbolsPriceData | undefined>>(async (symbol) => {
         try {
           const [history, intraday] = await Promise.all([
-            (from && to) ? this.stockData.getHistory(symbol, from, to) : this.stockData.getHistory(symbol),
+            ((from && to)
+            ? this.stockData.getHistory(symbol, from, to)
+            : this.stockData.getHistory(symbol)),
             this.stockData.getIntraday(symbol)
           ]);
 
