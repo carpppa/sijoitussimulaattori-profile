@@ -3,7 +3,8 @@ import { DailyQuote, TransactionWithUid } from '../models';
 /** Defines profile-services needed by transaction engine */
 interface IProfileData {
   getPendingTransactions(): Promise<TransactionWithUid[]>,
-  fulfillTransaction(): Promise<TransactionWithUid>,
+  fulfillTransaction(transactionId: string, fulfilled?: Date): Promise<TransactionWithUid>,
+  cancelTransaction(transactionId: string): Promise<TransactionWithUid>,
 }
 
 /** Defines stock-services needed by transaction engine */

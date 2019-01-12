@@ -21,6 +21,9 @@ const config = {
     SERVICE_ACCOUNT: getServiceAccount(),
     DATABASE_URL: process.env.DATABASE_URL || '',
     WEB_API_KEY: process.env.WEB_API_KEY || ''
+  },
+  stocks: {
+    API_URL: process.env.STOCK_API_URL || 'http://localhost:3000',
   }
 }
 

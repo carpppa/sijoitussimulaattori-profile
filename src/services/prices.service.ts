@@ -1,5 +1,6 @@
+import { IStockData, SymbolsPriceData } from '../models';
 import { isDefined } from '../utils';
-import { IStockData, SymbolsPriceData } from './models';
+import { stockDataService } from './stock-data.service';
 
 class PricesService {
 
@@ -12,7 +13,7 @@ class PricesService {
       symbols.map<Promise<SymbolsPriceData | undefined>>(async (symbol) => {
         try {
           const [history, intraday] = await Promise.all([
-            this.stockData.getHistory(symbol),
+            (from && to) ? this.stockData.getHistory(symbol, from, to) : this.stockData.getHistory(symbol),
             this.stockData.getIntraday(symbol)
           ]);
 
@@ -41,9 +42,11 @@ class PricesService {
 
     return prices;
   }
-
 }
+
+const pricesService = new PricesService(stockDataService);
 
 export {
   PricesService,
+  pricesService
 }

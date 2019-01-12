@@ -3,12 +3,27 @@ import * as admin from 'firebase-admin';
 
 import { DB, PORTFOLIO, STOCK, TRANSACTION } from '../firebase-constants';
 import { Transaction, TransactionExecuted, TransactionStatus, TransactionType, TransactionWithUid } from '../models';
-import { getAll, getData, getDataArray } from '../utils';
+import { getAll, getData, getDataArray, getTimestamp } from '../utils';
 
 async function getTransactionsForPortfolio(portfolioId: string): Promise<TransactionWithUid[]> {
   const query = await admin.firestore()
     .collection(DB.TRANSACTIONS)
     .where(TRANSACTION.PORTFOLIO_ID, '==', portfolioId)
+    .get()
+
+  if(query.empty) {
+    return [];
+  }
+
+  const transfers = await getAll(query.docs.map(d => d.ref));
+
+  return getDataArray<TransactionWithUid>(transfers);
+}
+
+async function getPendingTransactions(): Promise<TransactionWithUid[]> {
+  const query = await admin.firestore()
+    .collection(DB.TRANSACTIONS)
+    .where(TRANSACTION.STATUS, '==', TransactionStatus.MARKET)
     .get()
 
   if(query.empty) {
@@ -175,7 +190,7 @@ async function cancelSellTransaction(transactionId: string): Promise<Transaction
   return getData<TransactionWithUid>(cancelledTransaction);
 }
 
-async function fulfillTransaction(transactionId: string): Promise<TransactionWithUid> {
+async function fulfillTransaction(transactionId: string, fulfillmentDate?: Date): Promise<TransactionWithUid> {
   const fulfilledId = await admin.firestore().runTransaction(async (tx) => {
     // Get transaction data
     const transactionDoc = await tx.get(admin.firestore().collection(DB.TRANSACTIONS).doc(transactionId));
@@ -212,9 +227,11 @@ async function fulfillTransaction(transactionId: string): Promise<TransactionWit
       throw new Error("Transaction type unknown");
     }
 
+    const fulfilledAt = fulfillmentDate ? getTimestamp(fulfillmentDate) : Timestamp.now();
+
     await tx.set(
       transactionDoc.ref,
-      { status: TransactionStatus.FULFILLED, fulfilledAt: Timestamp.now() },
+      { status: TransactionStatus.FULFILLED, fulfilledAt },
       { mergeFields: [ TRANSACTION.STATUS, TRANSACTION.FULFILLED_AT ] },
     );
 
@@ -231,4 +248,5 @@ export {
   createTransactionForPortfolio,
   cancelTransaction,
   fulfillTransaction,
+  getPendingTransactions,
 }
