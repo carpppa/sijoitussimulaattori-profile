@@ -108,6 +108,44 @@
       }
     },
     "/profile/portfolio/{portfolioId}": {
+      "get": {
+        "tags": [
+          "Portfolio"
+        ],
+        "summary": "Get portfolio",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolioId",
+            "required": true,
+            "type": "string",
+            "description": "Portfolio where action is requested from"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Portfolio was found",
+            "schema": {
+              "$ref": "#/definitions/PortfolioWithStocks"
+            }
+          },
+          "400": {
+            "description": "Parameters invalid"
+          },
+          "401": {
+            "description": "Unauthorized/user not authenticated"
+          },
+          "403": {
+            "description": "User does not have ownership of the resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Portfolio"
@@ -273,13 +311,7 @@
               "items": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/Uid"
-                  },
-                  {
-                    "$ref": "#/definitions/TransactionRequest"
-                  },
-                  {
-                    "$ref": "#/definitions/MoneyTransactionBalanceChange"
+                    "$ref": "#/definitions/TransactionExecuted"
                   }
                 ]
               }
@@ -328,7 +360,7 @@
                   "$ref": "#/definitions/Uid"
                 },
                 {
-                  "$ref": "#/definitions/TransactionRequest"
+                  "$ref": "#/definitions/TransactionExecuted"
                 }
               ]
             }
@@ -427,6 +459,11 @@
         "name": {
           "type": "string",
           "description": "Name of the portfolio."
+        },
+        "balance": {
+          "type": "number",
+          "description": "Initial balance of the portfolio",
+          "default": 0
         }
       }
     },
@@ -448,6 +485,53 @@
             "balance": {
               "type": "number",
               "description": "Current balance of the portfolio"
+            }
+          }
+        }
+      ]
+    },
+    "Stock": {
+      "type": "object",
+      "required": [
+        "amount",
+        "avgPrice"
+      ],
+      "allOf": [
+        {
+          "properties": {
+            "uid": {
+              "type": "string",
+              "description": "UID of the stock. At the same time it is the symbol of the stock"
+            },
+            "amount": {
+              "type": "number",
+              "description": "Amount of owned stocks"
+            },
+            "avgPrice": {
+              "type": "number",
+              "description": "Average buy price of owned stocks"
+            }
+          }
+        }
+      ]
+    },
+    "PortfolioWithStocks": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Portfolio"
+        },
+        {
+          "properties": {
+            "stocks": {
+              "type": "array",
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/Stock"
+                  }
+                ]
+              }
             }
           }
         }
@@ -522,12 +606,46 @@
           "minimum": 0,
           "exclusiveMinimum": true
         },
-        "expires": {
+        "expiresAt": {
           "type": "string",
           "description": "Expiration time of the request",
           "format": "yyyy-MM-ddTHH:mm:ss"
         }
       }
+    },
+    "TransactionExecuted": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Uid"
+        },
+        {
+          "$ref": "#/definitions/TransactionRequest"
+        },
+        {
+          "properties": {
+            "state": {
+              "type": "string",
+              "description": "State of transaction",
+              "enum": [
+                "MARKET",
+                "CANCELLED",
+                "FULFILLED"
+              ]
+            },
+            "fulfilledAt": {
+              "description": "Timestamp of fulfillment, if fulfilled",
+              "type": "string",
+              "format": "yyyy-MM-ddTHH:mm:ss"
+            },
+            "cancelledAt": {
+              "description": "Timestamp of cancellation, if cancelled",
+              "type": "string",
+              "format": "yyyy-MM-ddTHH:mm:ss"
+            }
+          }
+        }
+      ]
     }
   }
 }

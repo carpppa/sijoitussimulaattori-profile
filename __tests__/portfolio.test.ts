@@ -12,6 +12,8 @@ import { getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/fir
 import { randomInt } from '../src/utils/general';
 import { WithUid } from './../src/utils/firebase-utils';
 
+const TEST_TIMEOUT = 10000;
+
 describe('/profile/portfolio', () => {
   let validToken: string;
   let validToken2: string;
@@ -91,7 +93,7 @@ describe('/profile/portfolio', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return 403 with invalid token', async (done) => {
 
@@ -103,7 +105,7 @@ describe('/profile/portfolio', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return empty list', async (done) => {
     const result = await request(app)
@@ -115,15 +117,21 @@ describe('/profile/portfolio', () => {
     expect(portfolios).toHaveLength(0);
     expect(result.status).toEqual(200);
     done();
-  });
+  }, TEST_TIMEOUT);
 
-  it('POST should return new portfolio', async (done) => {
+  it('POST should return new portfolio with default balance', async (done) => {
     const promises: Promise<void>[] = [];
 
     for(let i = 0; i < confs.portfolios.create; i++) {
       const createPortfolio = async () => {
         const portfolio: Portfolio = {
           name: 'test-portfolio-' + randomInt().toString()
+        }
+
+        const useDefaultBalance = i > 1;
+
+        if (!useDefaultBalance) {
+          portfolio.balance = 200;
         }
 
         const result = await request(app)
@@ -137,7 +145,12 @@ describe('/profile/portfolio', () => {
         confs.portfolios.created.push(created.uid);
         expect(created.name).toEqual(portfolio.name);
         allPortfolios[created.uid] = created;
-        expect(created.balance).toEqual(0);
+
+        if(!useDefaultBalance) {
+          expect(created.balance).toEqual(portfolio.balance);
+        } else {
+          expect(created.balance).toEqual(0);
+        }
       }
       promises.push(createPortfolio());
     }
@@ -145,7 +158,7 @@ describe('/profile/portfolio', () => {
     await Promise.all(promises);
 
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET with id should return single portfolio', async (done) => {
     const createdPortfolio = confs.portfolios.created[0];
@@ -157,12 +170,13 @@ describe('/profile/portfolio', () => {
     expect(result.status).toEqual(200);
     expect(result.body).toBeDefined();
     const pf = result.body as PortfolioWithUid;
-    expect(pf.balance).toEqual(0);
+    expect(pf.balance === 0 || pf.balance === 200).toBeTruthy();
     expect(pf.name).toBeDefined();
     expect(pf.ownerId).toEqual(testUser);
     expect(pf.uid).toBeDefined();
+    expect(pf.stocks).toBeDefined();
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return created portfolios', async (done) => {
     const result = await request(app)
@@ -176,13 +190,13 @@ describe('/profile/portfolio', () => {
     expect(portfolios).toHaveLength(confs.portfolios.create);
     expect(portfolios.map(pf => pf.uid)).toEqual(expect.arrayContaining(Object.keys(allPortfolios)));
     portfolios.forEach(pf => {
-      expect(pf.balance).toEqual(0);
+      expect(pf.balance === 0 || pf.balance === 200).toBeTruthy();
       expect(pf.name).toBeDefined();
       expect(pf.ownerId).toEqual(testUser);
       expect(pf.uid).toBeDefined();
     });
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('DELETE should disallow deleting other users portfolios', async (done) => {
 
@@ -202,7 +216,7 @@ describe('/profile/portfolio', () => {
 
     await Promise.all(promises);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('DELETE should return deleted portfolio uid', async (done) => {
 
@@ -228,7 +242,7 @@ describe('/profile/portfolio', () => {
 
     await Promise.all(promises);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should not return deleted portfolios', async (done) => {
     const result = await request(app)
@@ -246,5 +260,5 @@ describe('/profile/portfolio', () => {
     left.forEach(key => expect(portfolios.find(pf => pf.uid === key)).toBeDefined());
 
     done();
-  });
+  }, TEST_TIMEOUT);
 });

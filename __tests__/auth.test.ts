@@ -8,6 +8,8 @@ import * as firebase from '../src/firebase';
 import { getIdTokenForTest, getOrCreateUser, removeUser } from '../src/utils/firebase-test-utils';
 import { randomInt } from '../src/utils/general';
 
+const TEST_TIMEOUT = 10000;
+
 describe('/auth/hello', () => {
   let testUser: string;
   let validToken: string;
@@ -47,7 +49,7 @@ describe('/auth/hello', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return 403 with invalid token', async (done) => {
 
@@ -59,7 +61,7 @@ describe('/auth/hello', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return hello and uid with proper authentication', async (done) => {
 
@@ -71,7 +73,7 @@ describe('/auth/hello', () => {
     expect(result.body.uid).toEqual(testUser);
     expect(result.status).toEqual(200);
     done();
-  });
+  }, TEST_TIMEOUT);
 
   it('GET should return 403 with token for non existing user', async (done) => {
 
@@ -81,6 +83,6 @@ describe('/auth/hello', () => {
 
     expect(result.status).toEqual(403);
     done();
-  });
+  }, TEST_TIMEOUT);
 
 });
