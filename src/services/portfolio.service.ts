@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import { DB, PORTFOLIO } from '../firebase-constants';
 import { Portfolio, PortfolioWithOwner, PortfolioWithUid } from '../models';
 import { asUid, getAll, getData, getDataArray, WithUid } from '../utils';
-import { getStocksOfPortfolio } from './portfolio-stocks.service';
+import { getStocksOfPortfolio, getStocksOfPortfolioWithRevenue } from './portfolio-stocks.service';
 
 async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]> {
   return admin.firestore().runTransaction(async (tx) => {
@@ -28,9 +28,13 @@ async function getPortfolioById(portfolioId: string): Promise<PortfolioWithUid> 
   if (!doc.exists) {
     throw new Error("Requested portfolio does not exists");
   }
-
+  // Get stocks and their revenues for portfolio
   const portfolio = await getData<PortfolioWithUid>(doc);
-  portfolio.stocks = await getStocksOfPortfolio(portfolioId);
+  portfolio.stocks = await getStocksOfPortfolioWithRevenue(portfolioId);
+  // Calculate revenue of the portfolio.
+  const originalWorth = portfolio.stocks.reduce((acc, stock) => acc + stock.amount * stock.avgPrice, 0);
+  const changeOfWorth = portfolio.stocks.reduce((acc, stock) => acc + stock.amount * stock.avgPrice * (stock.revenue || 0), 0);
+  portfolio.revenue = changeOfWorth / originalWorth;
 
   return portfolio;
 }

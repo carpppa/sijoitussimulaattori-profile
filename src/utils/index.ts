@@ -6,3 +6,4 @@ export * from './get-service-account';
 export * from './logger';
 export * from './pre-serializers';
 export * from './promise-queue';
+export * from './stock-utils';

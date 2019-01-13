@@ -1,7 +1,7 @@
 import * as Joi from 'joi';
 
 import { WithUid } from './../utils/firebase-utils';
-import { StockInPortfolioWithUid } from './stock';
+import { StockInPortfolioWithRevenue } from './stock';
 
 interface Portfolio {
   name: string;
@@ -11,10 +11,12 @@ interface Portfolio {
 interface PortfolioWithOwner extends Portfolio {
   ownerId: string;
   balance: number;
-  stocks?: StockInPortfolioWithUid[];
+  stocks?: StockInPortfolioWithRevenue[];
 }
 
-type PortfolioWithUid = PortfolioWithOwner & WithUid;
+interface PortfolioWithUid extends PortfolioWithOwner, WithUid {
+  revenue?: number;
+}
 
 const portfolioSchema = Joi.object({
   name: Joi.string().required(),

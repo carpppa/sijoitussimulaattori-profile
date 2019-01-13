@@ -43,6 +43,14 @@ function isDefined<T>(item: T | undefined): item is T {
   return item !== undefined;
 }
 
+function isBetween(value: Date, after: Date, before: Date): boolean {
+  return after.getTime() <= value.getTime() && value.getTime() <= before.getTime();
+}
+
+function dateComparator(a: Date, b: Date) {
+  return a.getTime() - b.getTime();
+}
+
 export {
   ensureNecessaryEnvs,
   randomInt,
@@ -51,4 +59,6 @@ export {
   appendOrCreate,
   deleteOrEmpty,
   isDefined,
+  isBetween,
+  dateComparator,
 };

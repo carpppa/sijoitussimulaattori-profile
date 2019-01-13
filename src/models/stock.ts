@@ -7,7 +7,12 @@ interface StockInPortfolio {
 
 type StockInPortfolioWithUid = StockInPortfolio & WithUid;
 
+interface StockInPortfolioWithRevenue extends StockInPortfolioWithUid {
+  revenue?: number;
+}
+
 export {
   StockInPortfolio,
   StockInPortfolioWithUid,
+  StockInPortfolioWithRevenue,
 }

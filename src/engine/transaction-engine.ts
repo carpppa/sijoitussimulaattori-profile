@@ -1,7 +1,7 @@
 import { IPriceData, IProfileData, TransactionWithUid } from '../models';
-import { logger, preSerializeTransaction } from '../utils';
+import { filterSymbols, findOldestTransactionCreatedAt, logger, preSerializeTransaction } from '../utils';
 import { PromiseQueue } from '../utils/promise-queue';
-import { filterSymbols, findOldestTransactionCreatedAt, getTransactionsToFullfilmentDates } from './engine-utils';
+import { getTransactionsToFullfilmentDates } from './engine-utils';
 
 /** Responsible for fulfilling transactions */
 class TransactionEngine {
