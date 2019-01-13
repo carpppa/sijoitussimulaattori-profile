@@ -167,3 +167,10 @@ export const mockSellTransactionsShouldFullFillAt: { [key: string]: Date | undef
   'test-tx-3': mockRisingPrice['AAPL'].intraday[4].date,
   'test-tx-4': undefined,
 }
+
+export const mockSellTransactionsShouldExpire:  { [key: string]: boolean | undefined} = {
+  'test-tx-1': false,
+  'test-tx-2': false,
+  'test-tx-3': false,
+  'test-tx-4': true,
+}

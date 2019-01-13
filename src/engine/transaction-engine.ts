@@ -29,13 +29,13 @@ class TransactionEngine {
    * - Handle buys
    * - Handle sells
    */
-  async doCheck() {
+  async doCheck(to: Date) {
     // Get transactions
     const transactions = (await this.profileData.getPendingTransactions()).map(preSerializeTransaction);
     // Find oldest
     const oldest = findOldestTransactionCreatedAt(transactions);
     // Check transactions from oldest to now.
-    await this.doCheckBetween(transactions, oldest, new Date(Date.now()));
+    await this.doCheckBetween(transactions, oldest, to);
   }
 
   async doCheckBetween(transactions: TransactionWithUid[], from: Date, to: Date) {
@@ -52,8 +52,9 @@ class TransactionEngine {
   }
 }
 
-export const transactionEngine = new TransactionEngine(profileDataService, pricesService);
+const transactionEngine = new TransactionEngine(profileDataService, pricesService);
 
 export {
+  transactionEngine,
   TransactionEngine,
 }
