@@ -1,7 +1,6 @@
 import { IPriceData, IProfileData, TransactionWithUid } from '../models';
-import { preSerializeTransaction } from '../utils';
+import { logger, preSerializeTransaction } from '../utils';
 import { PromiseQueue } from '../utils/promise-queue';
-import { pricesService, profileDataService } from './../services';
 import { filterSymbols, findOldestTransactionCreatedAt, getTransactionsToFullfilmentDates } from './engine-utils';
 
 /** Responsible for fulfilling transactions */
@@ -14,11 +13,23 @@ class TransactionEngine {
 
   }
 
-  start(interval = 1000): void {
+  async start(interval = 15000): Promise<void> {
+    logger.debug("Engine: Starting...");
+
     const queue = new PromiseQueue({
       interval,
-      autorun: true
+      autorun: true,
     });
+
+    let _this = this;
+
+    const handler = async () => {
+      logger.debug("Engine: Checking transactions");
+      await _this.doCheck(new Date(Date.now()));
+      queue.enqueue(handler);
+    };
+
+    queue.enqueue(handler);
   }
 
   /**
@@ -32,6 +43,11 @@ class TransactionEngine {
   async doCheck(to: Date) {
     // Get transactions
     const transactions = (await this.profileData.getPendingTransactions()).map(preSerializeTransaction);
+    // Check if any
+    if (transactions.length === 0) {
+      logger.debug("Engine: No pending transactions");
+      return;
+    }
     // Find oldest
     const oldest = findOldestTransactionCreatedAt(transactions);
     // Check transactions from oldest to now.
@@ -49,12 +65,11 @@ class TransactionEngine {
     const expired = transactionStates.filter(t => t.expired).map(async (t) => this.profileData.cancelTransaction(t.transaction.uid));
     // Execute orders
     await Promise.all([...fullfilled, ...expired]);
+
+    logger.debug(`Engine: Transactions (${transactions.length}), Fulfilled (${fullfilled.length}), Expired (${expired.length})`);
   }
 }
 
-const transactionEngine = new TransactionEngine(profileDataService, pricesService);
-
 export {
-  transactionEngine,
   TransactionEngine,
 }

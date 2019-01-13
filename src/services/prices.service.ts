@@ -1,6 +1,5 @@
 import { IPriceData, IStockData, SymbolsPriceData } from '../models';
 import { isDefined } from '../utils';
-import { stockDataService } from './stock-data.service';
 
 class PricesService implements IPriceData {
 
@@ -46,9 +45,6 @@ class PricesService implements IPriceData {
   }
 }
 
-const pricesService = new PricesService(stockDataService);
-
 export {
   PricesService,
-  pricesService
 }

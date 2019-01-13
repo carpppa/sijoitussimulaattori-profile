@@ -16,6 +16,7 @@ const config = {
   app: {
     NODE_ENV: process.env.NODE_ENV || 'development',
     LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+    ENGINE_INTERVAL: process.env.ENGINE_INTERVAL ? parseInt(process.env.ENGINE_INTERVAL) : 60000,
   },
   firebase: {
     SERVICE_ACCOUNT: getServiceAccount(),
@@ -23,7 +24,7 @@ const config = {
     WEB_API_KEY: process.env.WEB_API_KEY || ''
   },
   stocks: {
-    API_URL: process.env.STOCK_API_URL || 'http://localhost:3000',
+    API_URL: process.env.STOCK_API_URL || 'http://localhost:3001',
   }
 }
 

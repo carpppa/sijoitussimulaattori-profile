@@ -35,6 +35,10 @@ Install the following plugins:
 - NODE_ENV
   - `production | development | test`
 - `LOG_LEVEL` : one of `winston` [log levels](https://github.com/winstonjs/winston#logging-levels) (optional, default value `info`)
+- ENGINE_INTERVAL
+  - Interval in ms between checking transactions. Defaults to 60000 if not set.
+- STOCK_API_URL
+  - Full url where stock-data can be fetched.
 - `DATABASE_URL` && `WEB_API_KEY` can be found from firebase console -> project settings -> general.
   -  Database url will be of format `https://{public-facing-name}.firebaseio.com`
 - Following will be found from firebase console -> project settings -> service accounts -> generate new private key.

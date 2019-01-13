@@ -37,7 +37,7 @@ function getTransactionsToFullfilmentDates(transactions: TransactionWithUid[], p
       return { transaction, fulfillment, expired: false };
 
     } catch (err) {
-      logger.error(`Handling transaction ${transaction.uid} failed: `, err);
+      logger.error(`Handling transaction ${transaction.uid} failed: ${err}`);
       return { transaction };
     }
   });

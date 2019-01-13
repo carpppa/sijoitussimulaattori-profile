@@ -17,6 +17,16 @@ interface Stock {
   close: number;
 }
 
+interface DailyQuoteResponse {
+  symbol: SymbolName;
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
 interface DailyQuote {
   symbol: SymbolName;
   date: Date;
@@ -38,4 +48,4 @@ interface Symbol {
   currency: string;
 }
 
-export { SymbolName, SUPPORTED_SYMBOLS, Stock, DailyQuote, Symbol };
+export { SymbolName, SUPPORTED_SYMBOLS, Stock, DailyQuote, Symbol, DailyQuoteResponse };
