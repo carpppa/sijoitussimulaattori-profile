@@ -1,6 +1,7 @@
 import app from './src/app';
-import { engine } from './src/engine';
 import { connect } from './src/firebase';
+
+/* import { engine } from './src/engine'; */
 
 connect();
 
@@ -10,6 +11,6 @@ app.listen(port, () => {
   console.log('Express server listening on port ' + port);
 });
 
-engine.start().then(() => {
+/* engine.start().then(() => {
   console.log('Transaction engine has started');
-});
+}); */

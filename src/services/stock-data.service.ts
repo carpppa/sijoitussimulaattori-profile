@@ -6,6 +6,7 @@ import { logger } from '../utils';
 
 const makeStockRequest = async <T>(endpoint: string): Promise<AxiosResponse<T>> => {
   try {
+    logger.debug(`Stock-data: Made GET to '${endpoint}'`);
     return await
       axios({
         method: 'get',

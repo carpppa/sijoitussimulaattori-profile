@@ -1,0 +1,8 @@
+const { connect } = require('../dist/src/firebase');
+const { engine } = require('../dist/src/engine');
+
+connect();
+
+const now = new Date(Date.now());
+
+engine.doCheck(now);
