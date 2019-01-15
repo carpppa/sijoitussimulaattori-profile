@@ -53,6 +53,7 @@ function whenTransactionFulfills(transaction: TransactionWithUid, price: PriceDa
   }
 }
 
+/** Returns date when stock price dives below buy price*/
 function whenBuyFulfills(transaction: TransactionWithUid, price: PriceData): Date | undefined {
   // Get needed dates
   const createdAt = getDate(transaction.createdAt);
@@ -71,7 +72,7 @@ function whenBuyFulfills(transaction: TransactionWithUid, price: PriceData): Dat
   return earliestFulfillment;
 }
 
-/** Returns date when stock price  */
+/** Returns date when stock price rises above selling price*/
 function whenSellFulfills(transaction: TransactionWithUid, price: PriceData): Date | undefined {
   // Get needed dates
   const createdAt = getDate(transaction.createdAt);

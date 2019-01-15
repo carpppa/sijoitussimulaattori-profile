@@ -15,7 +15,9 @@ interface PortfolioWithOwner extends Portfolio {
 }
 
 interface PortfolioWithUid extends PortfolioWithOwner, WithUid {
-  revenue?: number;
+  totalRevenue?: number;
+  lastDayRevenue?: number;
+  totalMarketValue?: number;
 }
 
 const portfolioSchema = Joi.object({

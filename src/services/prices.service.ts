@@ -1,5 +1,5 @@
 import { IPriceData, IStockData, SymbolsPriceData } from '../models';
-import { isDefined } from '../utils';
+import { isDefined, logger } from '../utils';
 
 class PricesService implements IPriceData {
 
@@ -26,7 +26,7 @@ class PricesService implements IPriceData {
 
           return data;
         } catch (err) {
-          // TODO: Log error
+          logger.debug(`Prices-service: Fetching prices failed. Error: ${err}`);
           return undefined;
         }
 

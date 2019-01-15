@@ -317,6 +317,15 @@ definitions:
           balance:
             type: "number"
             description: "Current balance of the portfolio"
+          totalRevenue:
+            type: "number"
+            description: "Development of the value since bought"
+          totalMarketValue:
+            type: "number"
+            description: "Total value of the portfolio with current price"
+          lastDayRevenue:
+            type: "number"
+            description: "Development of the value since last day"
             
   Stock:
     type: "object"
@@ -334,6 +343,15 @@ definitions:
           avgPrice: 
             type: "number"
             description: "Average buy price of owned stocks"
+          totalRevenue:
+            type: "number"
+            description: "Development of the value since bought"
+          totalMarketValue:
+            type: "number"
+            description: "Total value of the stocks with current price"
+          lastDayRevenue:
+            type: "number"
+            description: "Development of the value since last day"
     
   PortfolioWithStocks:
     type: "object"

@@ -8,7 +8,9 @@ interface StockInPortfolio {
 type StockInPortfolioWithUid = StockInPortfolio & WithUid;
 
 interface StockInPortfolioWithRevenue extends StockInPortfolioWithUid {
-  revenue?: number;
+  totalRevenue?: number;
+  lastDayRevenue?: number;
+  totalMarketValue?: number;
 }
 
 export {
