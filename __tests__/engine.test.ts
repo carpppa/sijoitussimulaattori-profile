@@ -36,7 +36,6 @@ describe('ENGINE', () => {
     transactions.forEach(t => {
       const fulfilledAt: Date | undefined = t.fulfillment;
       const shouldBe = mockSellTransactionsShouldFullFillAt[t.transaction.uid];
-      // console.log(`Transaction ${t.transaction.uid} should be fulfilled at '${shouldBe}' and was '${fulfilledAt}'`);
       expect(fulfilledAt).toEqual(shouldBe);
     })
 
@@ -50,7 +49,6 @@ describe('ENGINE', () => {
     transactions.forEach(t => {
       const fulfilledAt: Date | undefined = t.fulfillment;
       const shouldBe = mockBuyTransactionsShouldFullFillAt[t.transaction.uid];
-      // console.log(`Transaction ${t.transaction.uid} should be fulfilled at '${shouldBe}' and was '${fulfilledAt}'`);
       expect(fulfilledAt).toEqual(shouldBe);
     })
 
@@ -62,7 +60,6 @@ describe('ENGINE', () => {
     const transactions = getTransactionsToFullfilmentDates(mockExpiringBuyTransactions, mockRisingPrice, new Date(Date.parse("2018-01-01T01:05:00.000Z")));
 
     transactions.forEach(t => {
-      // console.log(`Transaction ${t.transaction.uid} should and was fulfilled '${t.fulfillment}' and should be expired but was: '${t.expired}'`);
       expect(t.expired).toBeTruthy();
       expect(t.fulfillment).toBeUndefined();
     })
@@ -75,7 +72,6 @@ describe('ENGINE', () => {
     const transactions = getTransactionsToFullfilmentDates(mockExpiringBuyTransactions, mockDivingPrice, new Date(Date.parse("2018-01-01T01:05:00.000Z")),);
 
     transactions.forEach(t => {
-      // console.log(`Transaction ${t.transaction.uid} should and was fulfilled '${t.fulfillment}' and should be expired but was: '${t.expired}'`);
       expect(t.expired).toBeTruthy();
       expect(t.fulfillment).toBeUndefined();
     })
