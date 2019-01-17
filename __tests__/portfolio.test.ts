@@ -175,6 +175,17 @@ describe('/profile/portfolio', () => {
     expect(pf.ownerId).toEqual(testUser);
     expect(pf.uid).toBeDefined();
     expect(pf.stocks).toBeDefined();
+    expect(pf.lastDayRevenue).toBeDefined();
+    expect(pf.totalMarketValue).toBeDefined();
+    expect(pf.totalRevenue).toBeDefined();
+    pf.stocks!.forEach(stock => {
+      expect(stock.amount).toBeDefined();
+      expect(stock.avgPrice).toBeDefined();
+      expect(stock.lastDayRevenue).toBeDefined();
+      expect(stock.totalMarketValue).toBeDefined();
+      expect(stock.totalRevenue).toBeDefined();
+      expect(stock.uid).toBeDefined();
+    });
     done();
   }, TEST_TIMEOUT);
 
@@ -194,6 +205,9 @@ describe('/profile/portfolio', () => {
       expect(pf.name).toBeDefined();
       expect(pf.ownerId).toEqual(testUser);
       expect(pf.uid).toBeDefined();
+      expect(pf.lastDayRevenue).toBeDefined();
+      expect(pf.totalMarketValue).toBeDefined();
+      expect(pf.totalRevenue).toBeDefined();
     });
     done();
   }, TEST_TIMEOUT);

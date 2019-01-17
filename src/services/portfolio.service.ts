@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import { DB, PORTFOLIO } from '../firebase-constants';
 import { Portfolio, PortfolioWithOwner, PortfolioWithUid } from '../models';
 import { asUid, getAll, getData, getDataArray, WithUid } from '../utils';
-import { addStockDataToPortfolio } from './portfolio-stocks.service';
+import { addStockDataToPortfolio, addValueDataToPortfolios } from './portfolio-stocks.service';
 
 async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]> {
   return admin.firestore().runTransaction(async (tx) => {
@@ -16,9 +16,11 @@ async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]>
       return [];
     }
 
-    const portfolios = await getAll(query.docs.map(d => d.ref));
+    const portfolioDocs = await getAll(query.docs.map(d => d.ref));
+    const portfoliosWithoutStocks = await getDataArray<PortfolioWithUid>(portfolioDocs);
+    const portfolios = await addValueDataToPortfolios(portfoliosWithoutStocks);
 
-    return getDataArray<PortfolioWithUid>(portfolios);
+    return portfolios;
   })
 }
 
