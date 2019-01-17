@@ -41,7 +41,7 @@ const deleteTransaction = async (req: Request, res: Response) => {
   try {
     const transactionId = req.params.transactionId;
 
-    const cancelled = await cancelTransaction(transactionId);
+    const cancelled = preSerializeTransaction(await cancelTransaction(transactionId));
     res.send(cancelled).status(200);
 
   } catch (error) {

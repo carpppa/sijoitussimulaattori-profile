@@ -1,0 +1,10 @@
+{
+  "symbol": "AAPL",
+  "name": "Apple Inc.",
+  "type": "string",
+  "region": "string",
+  "marketOpen": "2018-12-12 11:20:00",
+  "marketClose": "2018-12-12 11:20:00",
+  "timeZone": "US/Eastern",
+  "currency": "USD"
+}
