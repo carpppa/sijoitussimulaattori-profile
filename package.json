@@ -15,6 +15,7 @@
     "dev:delete-all-users": "tsc && env-cmd .env node ./dist/src/dev-utils/delete-all-users",
     "install:dummy": "cd ./dummy-server && npm ci",
     "start:dummy": "cd ./dummy-server && node ./index.js",
+    "do-check": "env-cmd .env node ./bin/transaction-engine-docheck",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "watch-serve": "env-cmd .env nodemon -L --watch ./dist --exec \"node --inspect\" ./dist/index.js",

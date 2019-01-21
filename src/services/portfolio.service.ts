@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import { DB, PORTFOLIO } from '../firebase-constants';
 import { Portfolio, PortfolioWithOwner, PortfolioWithUid } from '../models';
 import { asUid, getAll, getData, getDataArray, WithUid } from '../utils';
-import { getStocksOfPortfolio } from './portfolio-stocks.service';
+import { addStockDataToPortfolio, addValueDataToPortfolios } from './portfolio-stocks.service';
 
 async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]> {
   return admin.firestore().runTransaction(async (tx) => {
@@ -16,9 +16,11 @@ async function getPortfoliosForUser(userId: string): Promise<PortfolioWithUid[]>
       return [];
     }
 
-    const portfolios = await getAll(query.docs.map(d => d.ref));
+    const portfolioDocs = await getAll(query.docs.map(d => d.ref));
+    const portfoliosWithoutStocks = await getDataArray<PortfolioWithUid>(portfolioDocs);
+    const portfolios = await addValueDataToPortfolios(portfoliosWithoutStocks);
 
-    return getDataArray<PortfolioWithUid>(portfolios);
+    return portfolios;
   })
 }
 
@@ -28,9 +30,9 @@ async function getPortfolioById(portfolioId: string): Promise<PortfolioWithUid> 
   if (!doc.exists) {
     throw new Error("Requested portfolio does not exists");
   }
-
-  const portfolio = await getData<PortfolioWithUid>(doc);
-  portfolio.stocks = await getStocksOfPortfolio(portfolioId);
+  // Get stocks and their revenues for portfolio
+  const portfolioWithoutStocks = await getData<PortfolioWithUid>(doc);
+  const portfolio = await addStockDataToPortfolio(portfolioWithoutStocks);
 
   return portfolio;
 }
