@@ -60,3 +60,32 @@ Install the following plugins:
 - `npm run dev:generate-token` or `npm run generate:token -- UID=my-custom-user-uid` Generates authorization token for given uid.
 - `npm run dev:generate-token` or `npm run generate:token -- UID=my-custom-user-uid` Removes user with given uid from the database. NOTE: At the moment does not remove any records for that user.
 
+## Misc
+
+### Authenticating requests
+
+- Sender should obtain JWT token directly from firebase.
+- Sender should include header `Authorization: Bearer <token>` to requests
+- Receiver (this) will connect to firebase for validating tokens.
+- If authorization is successful, property `identity` is added to requests.
+- If authorization is unsuccessful, error will be returned.
+
+### How this works
+
+#### Profile-services
+
+- It is just a traditional REST API serving basically a CRUD functionality for the App.
+- See [server url]/api-docs
+
+#### Transaction-engine
+
+- Includes logic for completing transactions etc, making the simulator 'tick'.
+- One time check is done by calling bin/transaction-engine-docheck.
+  - Currently checks are scheduled using heroku scheduler.
+  - TransactionEngine class includes method `start` which can be called if outside scheduling is not available. One can use this by uncommenting lines from index.ts.
+- Cycle for completing transactions is following:
+  - Find all pending transactions from firestore.
+  - Find prices for all stocks present in these transactions.
+  - Find which of pending transactions should be completed (based on prices)
+  - Find which of pending transactions should be cancelled (based on expiration date)
+  - Cancel/Fulfill transactions.
