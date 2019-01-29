@@ -40,10 +40,10 @@
     "collectCoverage": true,
     "coverageThreshold": {
       "global": {
-        "statements": 80,
+        "statements": 75,
         "branches": 60,
-        "functions": 80,
-        "lines": 80
+        "functions": 75,
+        "lines": 75
       }
     },
     "collectCoverageFrom": [
@@ -59,7 +59,8 @@
       "/bin/",
       "engine.ts",
       "promise-queue.ts",
-      "/dev-utils/"
+      "/dev-utils/",
+      "general.ts"
     ],
     "coverageDirectory": "reports"
   },
