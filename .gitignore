@@ -27,3 +27,6 @@ node_modules/
 
 # VScode
 .vscode
+
+# Jest coverage reports
+reports/
