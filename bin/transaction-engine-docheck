@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { connect } = require('../dist/src/firebase');
 const { engine } = require('../dist/src/engine');
 
