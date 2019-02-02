@@ -1,6 +1,10 @@
 import * as Joi from 'joi';
 
-import { CreatedAt, FirebaseTimestamp, WithUid } from './../utils/firebase-utils';
+import {
+  CreatedAt,
+  FirebaseTimestamp,
+  WithUid,
+} from './../utils/firebase-utils';
 
 type Symbol = string;
 
@@ -10,12 +14,12 @@ enum TransactionStatus {
   /** Transaction was cancelled and this is final state. */
   CANCELLED = 'CANCELLED',
   /** Transaction was fulfilled and this is final state. */
-  FULFILLED = 'FULFILLED'
+  FULFILLED = 'FULFILLED',
 }
 
 enum TransactionType {
   SELL = 'SELL',
-  BUY = 'BUY'
+  BUY = 'BUY',
 }
 
 interface Transaction {
@@ -35,18 +39,21 @@ interface TransactionExecuted extends Transaction, CreatedAt {
 
 type TransactionWithUid = TransactionExecuted & WithUid;
 
-const transactionIdSchema = Joi.object({
+const portfolioIdWithTransactionIdSchema = Joi.object({
+  portfolioId: Joi.string().required(),
   transactionId: Joi.string().required(),
-})
+});
 
 const transactionSchema = Joi.object({
   symbol: Joi.string().required(),
-  amount: Joi.number().positive().integer().required(),
-  price: Joi.number().positive().required(),
-  type: Joi.only(
-    TransactionType.BUY,
-    TransactionType.SELL,
-  ).required(),
+  amount: Joi.number()
+    .positive()
+    .integer()
+    .required(),
+  price: Joi.number()
+    .positive()
+    .required(),
+  type: Joi.only(TransactionType.BUY, TransactionType.SELL).required(),
   expiresAt: Joi.date().required(),
 });
 
@@ -56,15 +63,25 @@ const transactionWithUidSchema = Joi.object({
   status: Joi.only(
     TransactionStatus.MARKET,
     TransactionStatus.CANCELLED,
-    TransactionStatus.FULFILLED,
+    TransactionStatus.FULFILLED
   ).required(),
   symbol: Joi.string().required(),
-  amount: Joi.number().integer().required(),
-  price: Joi.number().positive().required(),
-  type: Joi.only(
-    TransactionType.BUY,
-    TransactionType.SELL,
-  ).required(),
+  amount: Joi.number()
+    .integer()
+    .required(),
+  price: Joi.number()
+    .positive()
+    .required(),
+  type: Joi.only(TransactionType.BUY, TransactionType.SELL).required(),
 });
 
-export { TransactionStatus, Transaction, TransactionExecuted, TransactionWithUid, TransactionType, transactionSchema, transactionWithUidSchema, transactionIdSchema };
+export {
+  TransactionStatus,
+  Transaction,
+  TransactionExecuted,
+  TransactionWithUid,
+  TransactionType,
+  transactionSchema,
+  transactionWithUidSchema,
+  portfolioIdWithTransactionIdSchema,
+};
