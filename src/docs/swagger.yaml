@@ -1,444 +1,441 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
-  description: "This is documentation for sijoitussimulaattori-profile API"
-  version: "1.0.0"
-  title: "Sijoitussimulaattori"
+  description: 'This is documentation for sijoitussimulaattori-profile API'
+  version: '1.0.0'
+  title: 'Sijoitussimulaattori'
 
-host: "localhost:3000"
-basePath: "/"
+host: 'localhost:3000'
+basePath: '/'
 tags:
-- name: "test"
-  description: ""
+  - name: 'test'
+    description: ''
 schemes:
-- "https"
-- "http"
+  - 'https'
+  - 'http'
 paths:
   /:
     get:
       tags:
-      - "test"
-      summary: "Test api"
-      description: ""
-      operationId: "getHello"
+        - 'test'
+      summary: 'Test api'
+      description: ''
+      operationId: 'getHello'
       produces:
-      - "application/json"
+        - 'application/json'
       responses:
         200:
-          $ref: "#/definitions/Hello"
+          $ref: '#/definitions/Hello'
         405:
-          description: "Invalid input"
-          
+          description: 'Invalid input'
+
   /profile/portfolio:
     get:
       tags:
-        - "Portfolio"
-      summary: "Get portfolios"
+        - 'Portfolio'
+      summary: 'Get portfolios'
       produces:
-      - "application/json"
+        - 'application/json'
       responses:
         200:
-          description: "Successfully get portfolios"
+          description: 'Successfully get portfolios'
           schema:
-            type: "array"
+            type: 'array'
             items:
-              $ref: "#/definitions/Portfolio"
+              $ref: '#/definitions/Portfolio'
         401:
-          description: "Unauthorized/user not authenticated"
+          description: 'Unauthorized/user not authenticated'
     post:
-      tags: 
-      - "Portfolio"
-      summary: "Add new portfolio"
+      tags:
+        - 'Portfolio'
+      summary: 'Add new portfolio'
       produces:
-      - "application/json"
+        - 'application/json'
       parameters:
-      - in: body
-        name: portfolio
-        description: The portfolio to create.
-        schema:
-          $ref: "#/definitions/PortfolioRequest"
-      responses:
-        200:
-          description: "Successfully created portfolio"
+        - in: body
+          name: portfolio
+          description: The portfolio to create.
           schema:
-            allOf: 
-              - $ref: "#/definitions/Portfolio"
-        400:
-          description: "Parameters invalid"
-        401:
-          description: "Unauthorized/user not authenticated"
-        403: 
-          description: "User does not have ownership of the resource"
-        404: 
-          description: "Resource not found"
-      
-  /profile/portfolio/{portfolioId}:
-    get: 
-      tags: 
-      - "Portfolio"
-      summary: "Get portfolio"
-      produces:
-      - "application/json"
-      parameters:
-      - in: path
-        name: portfolioId
-        required: true
-        type: "string"
-        description: "Portfolio where action is requested from"
+            $ref: '#/definitions/PortfolioRequest'
       responses:
         200:
-          description: "Portfolio was found"
-          schema:
-            $ref: "#/definitions/PortfolioWithStocks"
-        400:
-          description: "Parameters invalid"
-        401:
-          description: "Unauthorized/user not authenticated"
-        403: 
-          description: "User does not have ownership of the resource"
-        404: 
-          description: "Resource not found"
-    delete: 
-      tags: 
-      - "Portfolio"
-      summary: "Delete portfolio"
-      produces:
-      - "application/json"
-      parameters:
-      - in: path
-        name: portfolioId
-        required: true
-        type: "string"
-        description: "Portfolio where action is requested from"
-      responses:
-        200:
-          description: "Delete was successful"
-          schema:
-            $ref: "#/definitions/Uid"
-        400:
-          description: "Parameters invalid"
-        401:
-          description: "Unauthorized/user not authenticated"
-        403: 
-          description: "User does not have ownership of the resource"
-        404: 
-          description: "Resource not found"
-  
-  /profile/portfolio/{portfolioId}/balance:
-    get: 
-      tags: 
-      - "Portfolio"
-      summary: "Get money transfers of portfolio"
-      description: "Endpoint for listing events (transactions, money transfers) of portfolio"
-      produces:
-      - "application/json"
-      parameters:
-      - in: path
-        name: portfolioId
-        required: true
-        type: "string"
-        description: "Portfolio where action is requested from"
-      responses:
-        200:
-          description: "Transactions fetched successfully"
-          schema:
-            type: "array"
-            items:
-              allOf: 
-              - $ref: "#/definitions/Uid"
-              - $ref: "#/definitions/MoneyTransactionRequest"
-              - $ref: "#/definitions/MoneyTransactionBalanceChange"
-        400:
-          description: "Parameters invalid"
-        401:
-          description: "Unauthorized/user not authenticated"
-    post: 
-      tags: 
-      - "Portfolio"
-      summary: "Withdraw or save money"
-      description: "Endpoint for withdrawing and saving money to/from portfolio"
-      produces:
-      - "application/json"
-      parameters:
-      - in: path
-        name: portfolioId
-        required: true
-        type: "string"
-        description: "Portfolio where action is requested from"
-      - in: body
-        name: transaction
-        description: The transaction to create.
-        schema:
-          $ref: "#/definitions/MoneyTransactionRequest"
-      responses:
-        200:
-          description: "Transfer was successful"
-          schema:
-            allOf: 
-              - $ref: "#/definitions/MoneyTransaction"
-        400:
-          description: "Parameters invalid"
-        401:
-          description: "Unauthorized/user not authenticated"
-        403: 
-          description: "User does not have ownership of the resource"
-        404: 
-          description: "Resource not found"
-
-  /profile/portfolio/{portfolioId}/transaction:
-    get: 
-      tags: 
-      - "Portfolio"
-      summary: "Get transactions of portfolio"
-      description: "Endpoint for listing events (transactions, money transfers) of portfolio"
-      produces:
-      - "application/json"
-      parameters:
-      - in: path
-        name: portfolioId
-        required: true
-        type: "string"
-        description: "Portfolio where action is requested from"
-      responses:
-        200:
-          description: "Transactions fetched successfully"
-          schema:
-            type: "array"
-            items:
-              allOf: 
-              - $ref: "#/definitions/TransactionExecuted"
-        400:
-          description: "Parameters invalid"
-        401:
-          description: "Unauthorized/user not authenticated"
-    post: 
-      tags: 
-      - "Portfolio"
-      summary: "Create transaction"
-      description: "Endpoint for creating sell/buy request"
-      produces:
-      - "application/json"
-      parameters:
-      - in: path
-        name: portfolioId
-        required: true
-        type: "string"
-        description: "Portfolio where action is requested from"
-      - in: body
-        name: transaction
-        description: Requested action.
-        schema:
-          $ref: "#/definitions/TransactionRequest"
-      responses:
-        200:
-          description: "Transaction creation successful"
+          description: 'Successfully created portfolio'
           schema:
             allOf:
-              - $ref: "#/definitions/Uid"
-              - $ref: "#/definitions/TransactionExecuted"
+              - $ref: '#/definitions/Portfolio'
         400:
-          description: "Parameters invalid"
+          description: 'Parameters invalid'
         401:
-          description: "Unauthorized/user not authenticated"
-        403: 
-          description: "User does not have ownership of the resource"
-        404: 
-          description: "Resource not found"
-          
-  /profile/portfolio/{portfolioId}/transaction/{transactionId}:
-    delete: 
-      tags: 
-      - "Portfolio"
-      summary: "Cancel transaction"
-      description: "Endpoint for cancelling selling/buying transactions"
+          description: 'Unauthorized/user not authenticated'
+        403:
+          description: 'User does not have ownership of the resource'
+        404:
+          description: 'Resource not found'
+
+  /profile/portfolio/{portfolioId}:
+    get:
+      tags:
+        - 'Portfolio'
+      summary: 'Get portfolio'
       produces:
-      - "application/json"
+        - 'application/json'
       parameters:
-      - in: path
-        name: portfolioId
-        required: true
-        type: "string"
-        description: "Portfolio where action is requested from"
-      - in: path
-        name: transactionId
-        required: true
-        type: "string"
+        - in: path
+          name: portfolioId
+          required: true
+          type: 'string'
+          description: 'Portfolio where action is requested from'
       responses:
         200:
-          description: "Transaction cancelled"
+          description: 'Portfolio was found'
           schema:
-            allOf: 
-              - $ref: "#/definitions/Uid"
+            $ref: '#/definitions/PortfolioWithStocks'
         400:
-          description: "Parameters invalid"
+          description: 'Parameters invalid'
         401:
-          description: "Unauthorized/user not authenticated"
-        403: 
-          description: "User does not have ownership of the resource"
-        404: 
-          description: "Resource not found"
-        
+          description: 'Unauthorized/user not authenticated'
+        403:
+          description: 'User does not have ownership of the resource'
+        404:
+          description: 'Resource not found'
+    delete:
+      tags:
+        - 'Portfolio'
+      summary: 'Delete portfolio'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: path
+          name: portfolioId
+          required: true
+          type: 'string'
+          description: 'Portfolio where action is requested from'
+      responses:
+        200:
+          description: 'Delete was successful'
+          schema:
+            $ref: '#/definitions/Uid'
+        400:
+          description: 'Parameters invalid'
+        401:
+          description: 'Unauthorized/user not authenticated'
+        403:
+          description: 'User does not have ownership of the resource'
+        404:
+          description: 'Resource not found'
+
+  /profile/portfolio/{portfolioId}/balance:
+    get:
+      tags:
+        - 'Portfolio'
+      summary: 'Get money transfers of portfolio'
+      description: 'Endpoint for listing events (transactions, money transfers) of portfolio'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: path
+          name: portfolioId
+          required: true
+          type: 'string'
+          description: 'Portfolio where action is requested from'
+      responses:
+        200:
+          description: 'Transactions fetched successfully'
+          schema:
+            type: 'array'
+            items:
+              allOf:
+                - $ref: '#/definitions/Uid'
+                - $ref: '#/definitions/MoneyTransactionRequest'
+                - $ref: '#/definitions/MoneyTransactionBalanceChange'
+        400:
+          description: 'Parameters invalid'
+        401:
+          description: 'Unauthorized/user not authenticated'
+    post:
+      tags:
+        - 'Portfolio'
+      summary: 'Withdraw or save money'
+      description: 'Endpoint for withdrawing and saving money to/from portfolio'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: path
+          name: portfolioId
+          required: true
+          type: 'string'
+          description: 'Portfolio where action is requested from'
+        - in: body
+          name: transaction
+          description: The transaction to create.
+          schema:
+            $ref: '#/definitions/MoneyTransactionRequest'
+      responses:
+        200:
+          description: 'Transfer was successful'
+          schema:
+            allOf:
+              - $ref: '#/definitions/MoneyTransaction'
+        400:
+          description: 'Parameters invalid'
+        401:
+          description: 'Unauthorized/user not authenticated'
+        403:
+          description: 'User does not have ownership of the resource'
+        404:
+          description: 'Resource not found'
+
+  /profile/portfolio/{portfolioId}/transaction:
+    get:
+      tags:
+        - 'Portfolio'
+      summary: 'Get transactions of portfolio'
+      description: 'Endpoint for listing events (transactions, money transfers) of portfolio'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: path
+          name: portfolioId
+          required: true
+          type: 'string'
+          description: 'Portfolio where action is requested from'
+      responses:
+        200:
+          description: 'Transactions fetched successfully'
+          schema:
+            type: 'array'
+            items:
+              allOf:
+                - $ref: '#/definitions/TransactionExecuted'
+        400:
+          description: 'Parameters invalid'
+        401:
+          description: 'Unauthorized/user not authenticated'
+    post:
+      tags:
+        - 'Portfolio'
+      summary: 'Create transaction'
+      description: 'Endpoint for creating sell/buy request'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: path
+          name: portfolioId
+          required: true
+          type: 'string'
+          description: 'Portfolio where action is requested from'
+        - in: body
+          name: transaction
+          description: Requested action.
+          schema:
+            $ref: '#/definitions/TransactionRequest'
+      responses:
+        200:
+          description: 'Transaction creation successful'
+          schema:
+            allOf:
+              - $ref: '#/definitions/Uid'
+              - $ref: '#/definitions/TransactionExecuted'
+        400:
+          description: 'Parameters invalid'
+        401:
+          description: 'Unauthorized/user not authenticated'
+        403:
+          description: 'User does not have ownership of the resource'
+        404:
+          description: 'Resource not found'
+
+  /profile/portfolio/{portfolioId}/transaction/{transactionId}:
+    delete:
+      tags:
+        - 'Portfolio'
+      summary: 'Cancel transaction'
+      description: 'Endpoint for cancelling selling/buying transactions'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: path
+          name: portfolioId
+          required: true
+          type: 'string'
+          description: 'Portfolio where action is requested from'
+        - in: path
+          name: transactionId
+          required: true
+          type: 'string'
+      responses:
+        200:
+          description: 'Transaction cancelled'
+          schema:
+            allOf:
+              - $ref: '#/definitions/Uid'
+        400:
+          description: 'Parameters invalid'
+        401:
+          description: 'Unauthorized/user not authenticated'
+        403:
+          description: 'User does not have ownership of the resource'
+        404:
+          description: 'Resource not found'
 
 definitions:
   Hello:
-    type: "object"
+    type: 'object'
     properties:
       message:
-        type: "string"
-  
+        type: 'string'
+
   Uid:
-    type: "object"
+    type: 'object'
     properties:
       uid:
-        description: "Uid of document. Autogenerated by database."
-        type: "string"
-        
+        description: 'Uid of document. Autogenerated by database.'
+        type: 'string'
+
   PortfolioRequest:
-    type: "object"
-    required: 
-    - name
+    type: 'object'
+    required:
+      - name
     properties:
       name:
-        type: "string"
-        description: "Name of the portfolio."
+        type: 'string'
+        description: 'Name of the portfolio.'
       balance:
-        type: "number"
-        description: "Initial balance of the portfolio"
+        type: 'number'
+        description: 'Initial balance of the portfolio'
         default: 0
-        
+
   Portfolio:
-    type: "object"
-    allOf: 
-      - $ref: "#/definitions/Uid"
-      - $ref: "#/definitions/PortfolioRequest"
+    type: 'object'
+    allOf:
+      - $ref: '#/definitions/Uid'
+      - $ref: '#/definitions/PortfolioRequest'
       - properties:
           ownerId:
-            type: "string"
-            description: "Owner of the portfolio"
+            type: 'string'
+            description: 'Owner of the portfolio'
           balance:
-            type: "number"
-            description: "Current balance of the portfolio"
-            
+            type: 'number'
+            description: 'Current balance of the portfolio'
+
   Stock:
-    type: "object"
+    type: 'object'
     required:
       - amount
       - avgPrice
-    allOf: 
+    allOf:
       - properties:
           uid:
-            type: "string"
-            description: "UID of the stock. At the same time it is the symbol of the stock"
-          amount: 
-            type: "number"
-            description: "Amount of owned stocks"
-          avgPrice: 
-            type: "number"
-            description: "Average buy price of owned stocks"
+            type: 'string'
+            description: 'UID of the stock. At the same time it is the symbol of the stock'
+          amount:
+            type: 'number'
+            description: 'Amount of owned stocks'
+          avgPrice:
+            type: 'number'
+            description: 'Average buy price of owned stocks'
           totalRevenue:
-            type: "number"
-            description: "Development of the value since bought"
+            type: 'number'
+            description: 'Development of the value since bought'
           totalMarketValue:
-            type: "number"
-            description: "Total value of the stocks with current price"
+            type: 'number'
+            description: 'Total value of the stocks with current price'
           lastDayRevenue:
-            type: "number"
-            description: "Development of the value since last day"
-    
+            type: 'number'
+            description: 'Development of the value since last day'
+
   PortfolioWithStocks:
-    type: "object"
+    type: 'object'
     allOf:
-      - $ref: "#/definitions/Portfolio"
+      - $ref: '#/definitions/Portfolio'
       - properties:
           totalRevenue:
-            type: "number"
-            description: "Development of the value since bought"
+            type: 'number'
+            description: 'Development of the value since bought'
           totalMarketValue:
-            type: "number"
-            description: "Total value of the portfolio with current price"
+            type: 'number'
+            description: 'Total value of the portfolio with current price'
           lastDayRevenue:
-            type: "number"
-            description: "Development of the value since last day"
+            type: 'number'
+            description: 'Development of the value since last day'
           stocks:
-            type: "array"
+            type: 'array'
             items:
               allOf:
-              - $ref: "#/definitions/Stock"
-        
+                - $ref: '#/definitions/Stock'
+
   MoneyTransactionRequest:
-    type: "object"
+    type: 'object'
     required:
-    - sum
+      - sum
     properties:
       sum:
-        type: "number"
-        description: "Sum to be withdrawn (negative) or saved (position)"
-        
+        type: 'number'
+        description: 'Sum to be withdrawn (negative) or saved (position)'
+
   MoneyTransactionBalanceChange:
-    type: "object"
+    type: 'object'
     required:
-    - oldBalance
-    - newBalance
+      - oldBalance
+      - newBalance
     properties:
       oldBalance:
-        type: "number"
-        description: "Balance before transaction"
+        type: 'number'
+        description: 'Balance before transaction'
       newBalance:
-        type: "number"
-        description: "Balance after transaction"
-        
+        type: 'number'
+        description: 'Balance after transaction'
+
   MoneyTransaction:
-    type: "object"
-    allOf: 
-      - $ref: "#/definitions/Uid"
-      - $ref: "#/definitions/MoneyTransactionRequest"
-      - $ref: "#/definitions/MoneyTransactionBalanceChange"
-        
+    type: 'object'
+    allOf:
+      - $ref: '#/definitions/Uid'
+      - $ref: '#/definitions/MoneyTransactionRequest'
+      - $ref: '#/definitions/MoneyTransactionBalanceChange'
+
   TransactionRequest:
-    type: "object"
+    type: 'object'
     properties:
-      type: 
-        type: "string"
-        description: "Sell or buy"
-        enum: 
-        - "SELL"
-        - "BUY"
+      type:
+        type: 'string'
+        description: 'Sell or buy'
+        enum:
+          - 'SELL'
+          - 'BUY'
       symbol:
-        type: "string"
-        description: "Symbol of stock"
+        type: 'string'
+        description: 'Symbol of stock'
       amount:
-        type: "integer"
-        description: "Amount of stocks"
+        type: 'integer'
+        description: 'Amount of stocks'
         minimum: 1
       price:
-        type: "number"
-        description: "Price of single stock"
+        type: 'number'
+        description: 'Price of single stock'
         minimum: 0
         exclusiveMinimum: true
       expiresAt:
-        type: "string"
-        description: "Expiration time of the request"
-        format: "yyyy-MM-ddTHH:mm:ss"
-        
+        type: 'string'
+        description: 'Expiration time of the request'
+        format: 'yyyy-MM-ddTHH:mm:ss'
+
   TransactionExecuted:
-    type: "object"
-    allOf: 
-      - $ref: "#/definitions/Uid"
-      - $ref: "#/definitions/TransactionRequest"
+    type: 'object'
+    allOf:
+      - $ref: '#/definitions/Uid'
+      - $ref: '#/definitions/TransactionRequest'
       - properties:
-          state: 
-            type: "string"
-            description: "State of transaction"
-            enum: 
-            - "MARKET"
-            - "CANCELLED"
-            - "FULFILLED"
+          status:
+            type: 'string'
+            description: 'Status of transaction'
+            enum:
+              - 'MARKET'
+              - 'CANCELLED'
+              - 'FULFILLED'
           fulfilledAt:
-            description: "Timestamp of fulfillment, if fulfilled"
-            type: "string"
-            format: "yyyy-MM-ddTHH:mm:ss"
+            description: 'Timestamp of fulfillment, if fulfilled'
+            type: 'string'
+            format: 'yyyy-MM-ddTHH:mm:ss'
           cancelledAt:
-            description: "Timestamp of cancellation, if cancelled"
-            type: "string"
-            format: "yyyy-MM-ddTHH:mm:ss"
-          
-    
+            description: 'Timestamp of cancellation, if cancelled'
+            type: 'string'
+            format: 'yyyy-MM-ddTHH:mm:ss'
